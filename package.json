@@ -1,0 +1,27 @@
+{
+  "name": "mebook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmm-066550/MEBOOK.git"
+  },
+  "author": "Moustapha Mahmoud",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmm-066550/MEBOOK/issues"
+  },
+  "homepage": "https://github.com/mmm-066550/MEBOOK#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "mongoose": "^6.1.7",
+    "passport": "^0.5.2"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
+  }
+}
