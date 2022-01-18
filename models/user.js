@@ -5,6 +5,12 @@ const randomize = require('randomatic');
 const crypto = require('crypto');
 
 const userSchema = new Schema({
+  role: {
+    type: String,
+    default: 'user',
+    enum: ['admin', 'user', 'owner'],
+    select: false,
+  },
   email: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -15,6 +21,8 @@ const userSchema = new Schema({
   account_verify_otp: { type: String, select: false },
   account_verify_token: { type: String, select: false },
   is_account_verified: { type: Boolean, default: false, select: false },
+
+  reset_password_token: { type: String, select: false },
 });
 
 // USER SCHEMA MIDDLEWARS
@@ -22,6 +30,7 @@ userSchema.pre(/^save/, async function () {
   if (this.isModified('password') || this.isNew) {
     const SALT = +process.env.SALT;
     this.password = await bcrypt.hash(this.password, SALT);
+    this.password_changed_at = Date.now();
   }
 });
 
@@ -34,6 +43,14 @@ userSchema.methods.initAccontVerification = async function () {
   this.account_verify_token = await bcrypt.hash(token, SALT);
   this.save({ validateBeforeSave: false });
   return { otp, token };
+};
+
+userSchema.methods.initForgotPassword = async function () {
+  const SALT = +process.env.SALT;
+  const token = crypto.randomBytes(64).toString('hex');
+  this.reset_password_token = await bcrypt.hash(token, SALT);
+  this.save({ validateBeforeSave: false });
+  return token;
 };
 
 const USER = model('USER', userSchema);

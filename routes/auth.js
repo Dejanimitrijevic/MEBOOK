@@ -1,37 +1,67 @@
 const express = require('express');
-const auth = express();
+const route = express();
 const sanitizeInputs = require('../helpers/sanitizeInputs');
 const {
   validateRegister,
   validateLogin,
   validateVerifyAccount,
+  validateReVerify,
+  validateForgotPassword,
+  validateResetPassword,
 } = require('../helpers/validateAuth');
 const {
   userRegister,
   userLogin,
   initAccountVerification,
+  reAccountVerification,
   userAccountVerify,
-  isUserLoggedIn,
+  authorize,
+  userForgotPassword,
+  userResetPassword,
 } = require('../controllers/auth');
 
-auth.get('/', isUserLoggedIn);
+route.get('/', authorize, (req, res) => {
+  res.status(200).json({
+    msg: 'ALL OK',
+    user: req.user,
+  });
+});
 
-auth.post(
+route.post(
   '/register',
   sanitizeInputs,
   validateRegister,
   userRegister,
   initAccountVerification
 );
-auth.post('/login', sanitizeInputs, validateLogin, userLogin);
-auth.post(
+
+route.post('/login', sanitizeInputs, validateLogin, userLogin);
+
+route.post(
   '/verify/:userID/:token',
   sanitizeInputs,
   validateVerifyAccount,
   userAccountVerify
 );
-auth.get('/re-verify/:userID', isUserLoggedIn, (req, res) => {
-  res.send(':::');
-});
 
-module.exports = auth;
+route.get(
+  '/re-verify/:userID',
+  authorize,
+  validateReVerify,
+  reAccountVerification
+);
+
+route.post(
+  '/forgot-password',
+  sanitizeInputs,
+  validateForgotPassword,
+  userForgotPassword
+);
+
+route.post(
+  '/reset-password/:id/:token',
+  sanitizeInputs,
+  validateResetPassword,
+  userResetPassword
+);
+module.exports = route;

@@ -4,6 +4,11 @@ const cookieParser = require('cookie-parser');
 
 // INITIALIZE API EXPRESS SERVER
 const app = express();
+app.get('/', (req, res) => {
+  res.status(200).json({
+    msg: 'MEBOOK API',
+  });
+});
 
 // API SERVER MIDDLEWARS
 app.use(express.json());

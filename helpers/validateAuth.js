@@ -137,6 +137,85 @@ class AuthValidate {
         });
       }
     };
+    /// VALIDATE USER ACCOUNT RE_VERIFICATION PROCESS
+    this.validateReVerify = async (req, res, next) => {
+      const user = await USER.findOne(req.user).select('+is_account_verified');
+      if (user && user.is_account_verified) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'your account is already verified.',
+        });
+      }
+      next();
+    };
+    /// VALIDATE ACCOUNT FORGOT PASSWORD
+    this.validateForgotPassword = async (req, res, next) => {
+      const { email } = req.body;
+      const user = await USER.findOne({ email });
+      if (!user) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'incorrect email address.',
+        });
+      }
+      req.user = user;
+      next();
+    };
+    /// VALIDATE ACCOUNT RESET PASSWORD
+    this.validateResetPassword = async (req, res, next) => {
+      const { id, token } = req.params;
+      try {
+        const user = await USER.findById(id).select(
+          '+reset_password_token +password'
+        );
+        if (!user) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'invalid or expired reset password token, try request again.',
+          });
+        }
+        if (user) {
+          if (!(await bcrypt.compare(token, user.reset_password_token))) {
+            return res.status(400).json({
+              status: 'error',
+              msg: 'invalid or expired reset password token, try request again.',
+            });
+          } else {
+            // CHECK FOR NEEDED DATA
+            if (
+              isDataMissed(req.body, 'newPassword', 'newPasswordConfirmation')
+            ) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'please enter the required fields to reset password.',
+              });
+            }
+            // CHECK IF PASSWORD AND CONFIRMATION ARE NOT THE SAME
+            const { newPassword, newPasswordConfirmation } = req.body;
+            if (!validator.isStrongPassword(newPassword, { minSymbols: 0 })) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'your password must be at least 8 characters with uppercase and numbers',
+              });
+            }
+            if (newPassword !== newPasswordConfirmation) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'password and password confirmation are not the same.',
+              });
+            }
+            req.user = user;
+            req.password = newPassword || newPasswordConfirmation;
+          }
+        }
+        next();
+      } catch (error) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'invalid or expired reset password token, try request again.',
+        });
+      }
+    };
   }
 }
 
