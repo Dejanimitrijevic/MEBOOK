@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 // API AUTHENTICATION ROUTE
 const auth = require('./routes/auth');
-app.use('/auth', auth);
+app.use('/api/auth', auth);
 
 const PORT = process.env.PORT || 4040;
 app.listen(PORT, () => {
