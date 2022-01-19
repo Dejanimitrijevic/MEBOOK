@@ -18,6 +18,7 @@ const {
   authorize,
   userForgotPassword,
   userResetPassword,
+  userLogout,
 } = require('../controllers/auth');
 
 route.get('/', authorize, (req, res) => {
@@ -64,4 +65,6 @@ route.post(
   validateResetPassword,
   userResetPassword
 );
+
+route.get('/logout', authorize, userLogout);
 module.exports = route;
