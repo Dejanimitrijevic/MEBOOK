@@ -1,10 +1,12 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const auth = require('./routes/auth');
 
 // INITIALIZE API EXPRESS SERVER
 const app = express();
+app.use(cors());
 
 // API SERVER MIDDLEWARS
 app.use(express.json());
