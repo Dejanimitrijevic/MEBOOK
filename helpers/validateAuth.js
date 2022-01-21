@@ -137,6 +137,46 @@ class AuthValidate {
         });
       }
     };
+    /// VALIDATE USER ACCOUNT VERIFICATION PROCESS (CLIENT_SIDE)
+    this.validateVerifyAccountClient = async (req, res, next) => {
+      const { userID, token } = req.params;
+      try {
+        // GET USER BY ID IN REQ PARAMS
+        const user = await USER.findById(userID).select(
+          '+account_verify_otp +account_verify_token +is_account_verified'
+        );
+        // IF NO USER EXIST WITH THIS ID
+        if (!user) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'invalid or expired account verification token, try request again.',
+          });
+        }
+        // IF TOKENS IN NOT MATCHED (INVALID OR EXPIRED)
+        if (!(await bcrypt.compare(token, user.account_verify_token))) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'invalid or expired account verification token, try request again.',
+          });
+        }
+        if (user && user.is_account_verified) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'your account is already verified.',
+          });
+        }
+        return res.status(200).json({
+          status: 'success',
+          msg: 'valid token',
+          user,
+        });
+      } catch (error) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'invalid or expired account verification token, try request again.',
+        });
+      }
+    };
     /// VALIDATE USER ACCOUNT RE_VERIFICATION PROCESS
     this.validateReVerify = async (req, res, next) => {
       const user = await USER.findOne(req.user).select('+is_account_verified');

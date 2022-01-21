@@ -8,6 +8,7 @@ const {
   validateReVerify,
   validateForgotPassword,
   validateResetPassword,
+  validateVerifyAccountClient,
 } = require('../helpers/validateAuth');
 const {
   userRegister,
@@ -38,6 +39,7 @@ route.post(
 
 route.post('/login', sanitizeInputs, validateLogin, userLogin);
 
+route.post('/check/:userID/:token', validateVerifyAccountClient);
 route.post(
   '/verify/:userID/:token',
   sanitizeInputs,

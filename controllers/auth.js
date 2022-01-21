@@ -101,13 +101,15 @@ class Authentication {
     this.initAccountVerification = async (req, res, next) => {
       const user = await USER.findOne(req.user);
       const { otp, token } = await user.initAccontVerification();
+      console.log(otp);
+
       // SUCCESS RESPONSE
       res.status(201).json({
         status: 'success',
         msg: 'account created successfully ✅.',
         data: {
           userID: user._id,
-          otp,
+          user,
           token,
         },
       });
@@ -140,7 +142,7 @@ class Authentication {
       user.save({ validateBeforeSave: false });
       return res.status(200).json({
         status: 'success',
-        msg: 'your account has been verified successfully ✅.',
+        msg: 'your account verified successfully ✅.',
       });
     };
     /// AUTHENTICATION  USER FORGOT PASSWORD
