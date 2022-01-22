@@ -20,9 +20,6 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 // API AUTHENTICATION ROUTE
-app.get('/api', (req, res) => {
-  res.status(200).json({ message: 'MEBOOK' });
-});
 app.use('/api/auth', auth);
 
 const PORT = process.env.PORT || 4040;
