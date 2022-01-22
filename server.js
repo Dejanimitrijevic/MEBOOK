@@ -22,7 +22,7 @@ const app = express();
 
 // API AUTHENTICATION ROUTE
 // app.use('/api/auth', auth);
-app.use('/', (req, res) => {
+app.all('/', (req, res) => {
   res.status(200).json({ message: 'MEBOOK API SERVER' });
 });
 
