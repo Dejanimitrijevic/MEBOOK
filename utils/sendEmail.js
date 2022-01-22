@@ -8,7 +8,12 @@ module.exports = (email, temp, data) => {
     },
     send: true,
     transport: {
-      jsonTransport: true,
+      host: 'smtp.ethereal.email',
+      port: 587,
+      auth: {
+        user: 'ava.sporer98@ethereal.email',
+        pass: 'He87sBUbJJr53Cusum',
+      },
     },
     juice: true,
     juiceSettings: {
