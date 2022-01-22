@@ -6,7 +6,7 @@ const auth = require('./routes/auth');
 
 // INITIALIZE API EXPRESS SERVER
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
   // res.header('Access-Control-Allow-Origin', '*');
   // res.header('Access-Control-Allow-Headers', '*');
