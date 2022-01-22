@@ -30,7 +30,7 @@ class AuthValidate {
           if (!validator.isAlpha(req.body[value], 'en-US', { ignore: ' ' })) {
             return res.status(400).json({
               status: 'error',
-              msg: 'user name must contains only letters (a-z)(A-Z).',
+              msg: 'user name can contains only letters (a-z)(A-Z)',
             });
           }
         }
@@ -142,36 +142,36 @@ class AuthValidate {
       const { userID, token } = req.params;
       try {
         // GET USER BY ID IN REQ PARAMS
-        const user = await USER.findById(userID).select(
+        let user = await USER.findById(userID).select(
           '+account_verify_otp +account_verify_token +is_account_verified'
         );
         // IF NO USER EXIST WITH THIS ID
         if (!user) {
-          return res.status(400).json({
+          return res.status(403).json({
             status: 'error',
             msg: 'invalid or expired account verification token, try request again.',
           });
         }
         // IF TOKENS IN NOT MATCHED (INVALID OR EXPIRED)
         if (!(await bcrypt.compare(token, user.account_verify_token))) {
-          return res.status(400).json({
+          return res.status(403).json({
             status: 'error',
             msg: 'invalid or expired account verification token, try request again.',
           });
         }
         if (user && user.is_account_verified) {
-          return res.status(400).json({
+          return res.status(403).json({
             status: 'error',
             msg: 'your account is already verified.',
           });
         }
+        // GET USER
+        user = await USER.findById(userID);
         return res.status(200).json({
-          status: 'success',
-          msg: 'valid token',
           user,
         });
       } catch (error) {
-        return res.status(400).json({
+        return res.status(403).json({
           status: 'error',
           msg: 'invalid or expired account verification token, try request again.',
         });
@@ -249,6 +249,37 @@ class AuthValidate {
           }
         }
         next();
+      } catch (error) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'invalid or expired reset password token, try request again.',
+        });
+      }
+    };
+    /// VALIDATE ACCOUNT RESET PASSWORD (CLIENT_SIDE)
+    this.validateResetPassClient = async (req, res, next) => {
+      const { id, token } = req.params;
+      try {
+        const user = await USER.findById(id).select('+reset_password_token');
+        if (!user) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'invalid or expired reset password token, try request again.',
+          });
+        }
+        if (user) {
+          if (!(await bcrypt.compare(token, user.reset_password_token))) {
+            return res.status(400).json({
+              status: 'error',
+              msg: 'invalid or expired reset password token, try request again.',
+            });
+          }
+        }
+        return res.status(200).json({
+          status: 'success',
+          msg: 'valid token',
+          user,
+        });
       } catch (error) {
         return res.status(400).json({
           status: 'error',

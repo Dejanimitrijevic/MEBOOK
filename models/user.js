@@ -20,7 +20,7 @@ const userSchema = new Schema({
 
   account_verify_otp: { type: String, select: false },
   account_verify_token: { type: String, select: false },
-  is_account_verified: { type: Boolean, default: false },
+  is_account_verified: { type: Boolean, default: false, select: false },
 
   reset_password_token: { type: String, select: false },
 });

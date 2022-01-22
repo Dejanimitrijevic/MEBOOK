@@ -9,6 +9,7 @@ const {
   validateForgotPassword,
   validateResetPassword,
   validateVerifyAccountClient,
+  validateResetPassClient,
 } = require('../helpers/validateAuth');
 const {
   userRegister,
@@ -22,26 +23,25 @@ const {
   userLogout,
 } = require('../controllers/auth');
 
-route.get('/', authorize, (req, res) => {
-  res.status(200).json({
-    msg: 'ALL OK',
-    user: req.user,
-  });
-});
+const {
+  sendAccVerification,
+  sendForgotPassword,
+} = require('../controllers/emails');
 
 route.post(
   '/register',
   sanitizeInputs,
   validateRegister,
   userRegister,
-  initAccountVerification
+  initAccountVerification,
+  sendAccVerification
 );
 
 route.post('/login', sanitizeInputs, validateLogin, userLogin);
 
-route.post('/check/:userID/:token', validateVerifyAccountClient);
 route.post(
   '/verify/:userID/:token',
+  authorize,
   sanitizeInputs,
   validateVerifyAccount,
   userAccountVerify
@@ -58,7 +58,8 @@ route.post(
   '/forgot-password',
   sanitizeInputs,
   validateForgotPassword,
-  userForgotPassword
+  userForgotPassword,
+  sendForgotPassword
 );
 
 route.post(
@@ -69,4 +70,17 @@ route.post(
 );
 
 route.get('/logout', authorize, userLogout);
+
+/// FOR CLIENT SIDE
+route.post(
+  '/check_acc_verify/:userID/:token',
+  authorize,
+  validateVerifyAccountClient
+);
+route.post(
+  '/check_reset_pass/:userID/:token',
+  authorize,
+  validateResetPassClient
+);
+
 module.exports = route;

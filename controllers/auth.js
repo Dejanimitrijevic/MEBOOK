@@ -11,7 +11,7 @@ class Authentication {
       // CHECK IF NO TOKEN
       if (!token) {
         return res.status(401).json({
-          status: 'success',
+          status: 'error',
           msg: 'not logged in, try log in again.',
         });
       }
@@ -21,7 +21,7 @@ class Authentication {
           const valid = jwt.verify(token, process.env.JWT_SECRET_KEY);
           if (!valid) {
             return res.status(401).json({
-              status: 'success',
+              status: 'error',
               msg: 'not logged in, try log in again.',
             });
           }
@@ -31,14 +31,14 @@ class Authentication {
             );
             if (!user) {
               return res.status(401).json({
-                status: 'success',
+                status: 'error',
                 msg: 'not logged in, try log in again.',
               });
             }
             if (user) {
               if (Date.parse(user.password_changed_at) > valid.iat * 1000) {
                 return res.status(401).json({
-                  status: 'success',
+                  status: 'error',
                   msg: 'password changed after session is issued, try login again.',
                 });
               }
@@ -46,7 +46,7 @@ class Authentication {
           }
         } catch (error) {
           return res.status(401).json({
-            status: 'success',
+            status: 'error',
             msg: 'not logged in, try log in again.',
           });
         }
@@ -77,6 +77,16 @@ class Authentication {
       req.user = user;
       next();
     };
+    /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
+    this.initAccountVerification = async (req, res, next) => {
+      const user = await USER.findOne(req.user);
+      const { otp, token } = await user.initAccontVerification();
+      // CONTINUE
+      req.userId = user.id;
+      req.token = token;
+      req.otp = otp;
+      next();
+    };
     /// AUTHENTICATION USER LOGIN METHOD
     this.userLogin = async (req, res, next) => {
       const { user } = req;
@@ -97,24 +107,7 @@ class Authentication {
         msg: 'logged in successfully ✅.',
       });
     };
-    /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
-    this.initAccountVerification = async (req, res, next) => {
-      const user = await USER.findOne(req.user);
-      const { otp, token } = await user.initAccontVerification();
-      console.log(otp);
 
-      // SUCCESS RESPONSE
-      res.status(201).json({
-        status: 'success',
-        msg: 'account created successfully ✅.',
-        data: {
-          userID: user._id,
-          user,
-          token,
-        },
-      });
-      next();
-    };
     /// AUTHENTICATION RE_INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.reAccountVerification = async (req, res, next) => {
       const user = await USER.findOne(req.user);
@@ -149,16 +142,11 @@ class Authentication {
     this.userForgotPassword = async (req, res, next) => {
       const user = await USER.findOne(req.user);
       const token = await user.initForgotPassword();
-      return next(
-        res.status(201).json({
-          status: 'success',
-          msg: 'reset password token issused successfully ✅.',
-          data: {
-            userID: user._id,
-            token,
-          },
-        })
-      );
+      // CONTINUE
+      req.token = token;
+      req.user = user;
+      req.userId = user.id;
+      next();
     };
     /// AUTHENTICATION  USER RESET PASSWORD
     this.userResetPassword = async (req, res, next) => {
