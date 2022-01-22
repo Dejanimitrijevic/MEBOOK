@@ -6,6 +6,7 @@ module.exports = (email, temp, data) => {
     message: {
       from: process.env.APP_EMAIL,
     },
+    send: true,
     transport: {
       jsonTransport: true,
     },
