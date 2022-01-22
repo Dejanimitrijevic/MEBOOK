@@ -8,6 +8,7 @@ const auth = require('./routes/auth');
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', '*');
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
@@ -20,12 +21,6 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 // API AUTHENTICATION ROUTE
-app.all('/', (req, res) => {
-  res.send({ msg: 'WELCOME MEBOOK !' });
-});
-app.all('/api', (req, res) => {
-  res.send({ msg: 'WELCOME MEBOOK API!' });
-});
 app.use('/api/auth', auth);
 
 const PORT = process.env.PORT || 4040;
