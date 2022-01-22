@@ -73,6 +73,8 @@ class Authentication {
         maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
         httpOnly: true,
         secure: true,
+        domain: '*',
+        sameSite: 'none',
       });
       req.user = user;
       next();
@@ -100,6 +102,8 @@ class Authentication {
         maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
         httpOnly: true,
         secure: true,
+        domain: '*',
+        sameSite: 'none',
       });
       // SUCCESS RESPONSE
       res.status(200).json({
