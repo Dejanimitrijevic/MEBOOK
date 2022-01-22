@@ -76,12 +76,12 @@ route.get('/logout', authorize, userLogout);
 /// FOR CLIENT SIDE
 route.post(
   '/check_acc_verify/:userID/:token',
-  authorize,
+  // authorize,
   validateVerifyAccountClient
 );
 route.post(
   '/check_reset_pass/:userID/:token',
-  authorize,
+  // authorize,
   validateResetPassClient
 );
 
