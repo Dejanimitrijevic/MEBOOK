@@ -8,10 +8,13 @@ const auth = require('./routes/auth');
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'localhost:3000');
+  res.header('Access-Control-Allow-Origin', 'https://mebook-app.netlify.app/');
   res.header('Access-Control-Allow-Headers', '*');
   res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET,PUT,POST,DELETE,PATCH,OPTION'
+  );
   next();
 });
 
