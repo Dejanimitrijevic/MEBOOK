@@ -6,17 +6,17 @@ const auth = require('./routes/auth');
 
 // INITIALIZE API EXPRESS SERVER
 const app = express();
-app.use(cors({ credentials: true, origin: true }));
-app.use(function (req, res, next) {
-  // res.header('Access-Control-Allow-Origin', '*');
-  // res.header('Access-Control-Allow-Headers', '*');
-  // res.header('Access-Control-Allow-Credentials', true);
-  // res.header(
-  // 'Access-Control-Allow-Methods',
-  // 'GET,PUT,POST,DELETE,PATCH,OPTION'
-  // );
-  next();
-});
+app.use(cors({ preflightContinue: true, credentials: true, origin: '*' }));
+// app.use(function (req, res, next) {
+// res.header('Access-Control-Allow-Origin', '*');
+// res.header('Access-Control-Allow-Headers', '*');
+// res.header('Access-Control-Allow-Credentials', true);
+// res.header(
+// 'Access-Control-Allow-Methods',
+// 'GET,PUT,POST,DELETE,PATCH,OPTION'
+// );
+// next();
+// });
 
 // API SERVER MIDDLEWARS
 app.use(express.json());
