@@ -71,8 +71,8 @@ class Authentication {
       // SET JWT COOKIE
       res.cookie('jwt', jwt_token, {
         maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
-        httpOnly: false,
-        signed: false,
+        httpOnly: true,
+        secure: true,
       });
       req.user = user;
       next();
@@ -98,8 +98,8 @@ class Authentication {
       // SET JWT COOKIE
       res.cookie('jwt', jwt_token, {
         maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
-        httpOnly: false,
-        signed: false,
+        httpOnly: true,
+        secure: true,
       });
       // SUCCESS RESPONSE
       res.status(200).json({
