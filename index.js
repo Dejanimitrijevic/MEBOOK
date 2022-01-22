@@ -2,7 +2,7 @@
 require('dotenv').config('./.env');
 
 // CONNECT MONGO DATABASE
-require('./database');
+// require('./database');
 
 // CONNECT API SERVER
 require('./server');
