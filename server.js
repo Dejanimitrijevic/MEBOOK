@@ -22,6 +22,9 @@ app.use(cookieParser());
 
 // API AUTHENTICATION ROUTE
 app.use('/api/auth', auth);
+app.use('/',(req,res)=>{
+  res.status(200).json({message:'MEBOOK API SERVER'})
+})
 
 const PORT = process.env.PORT || 4040;
 app.listen(PORT, () => {
