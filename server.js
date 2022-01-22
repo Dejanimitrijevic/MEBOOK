@@ -20,10 +20,13 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 // API AUTHENTICATION ROUTE
-// app.use('/api/auth', auth);
 app.all('/', (req, res) => {
-  red.send({ msg: 'WELCOME MEBOOK !' });
+  res.send({ msg: 'WELCOME MEBOOK !' });
 });
+app.all('/api', (req, res) => {
+  res.send({ msg: 'WELCOME MEBOOK API!' });
+});
+app.use('/api/auth', auth);
 
 const PORT = process.env.PORT || 4040;
 app.listen(PORT, () => {

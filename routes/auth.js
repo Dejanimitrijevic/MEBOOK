@@ -28,6 +28,8 @@ const {
   sendForgotPassword,
 } = require('../controllers/emails');
 
+route.all('/', (req, res) => res.json({ msg: 'MEBOOK API AUTH' }));
+
 route.post(
   '/register',
   sanitizeInputs,
