@@ -1,5 +1,4 @@
 const express = require('express');
-const route = express();
 const sanitizeInputs = require('../helpers/sanitizeInputs');
 const {
   validateRegister,
@@ -11,10 +10,17 @@ const {
   validateVerifyAccountClient,
   validateResetPassClient,
 } = require('../helpers/validateAuth');
+
+const {
+  sendAccVerification,
+  sendNewOtp,
+  sendForgotPassword,
+} = require('../controllers/emails');
+
 const {
   userRegister,
-  userLogin,
   initAccountVerification,
+  userLogin,
   reAccountVerification,
   userAccountVerify,
   authorize,
@@ -23,12 +29,11 @@ const {
   userLogout,
 } = require('../controllers/auth');
 
-const {
-  sendAccVerification,
-  sendForgotPassword,
-} = require('../controllers/emails');
+// INIT ROUTE
+const auth = express();
 
-route.post(
+/// AUTHENTICATION USER REGISTER ROUTE
+auth.post(
   '/register',
   sanitizeInputs,
   validateRegister,
@@ -37,9 +42,11 @@ route.post(
   sendAccVerification
 );
 
-route.post('/login', sanitizeInputs, validateLogin, userLogin);
+/// AUTHENTICATION USER LOGIN ROUTE
+auth.post('/login', sanitizeInputs, validateLogin, userLogin);
 
-route.post(
+/// AUTHENTICATION USER VERIFY ACCOUNT ROUTE
+auth.post(
   '/verify/:userID/:token',
   authorize,
   sanitizeInputs,
@@ -47,14 +54,17 @@ route.post(
   userAccountVerify
 );
 
-route.get(
+/// AUTHENTICATION USER VERIFY ACCOUNT RE_PROCESS ROUTE
+auth.get(
   '/re-verify/:userID',
   authorize,
   validateReVerify,
-  reAccountVerification
+  reAccountVerification,
+  sendNewOtp
 );
 
-route.post(
+/// AUTHENTICATION USER FORGOT ACCOUNT PASSWORD ROUTE
+auth.post(
   '/forgot-password',
   sanitizeInputs,
   validateForgotPassword,
@@ -62,25 +72,18 @@ route.post(
   sendForgotPassword
 );
 
-route.post(
+auth.post(
   '/reset-password/:id/:token',
   sanitizeInputs,
   validateResetPassword,
   userResetPassword
 );
 
-route.get('/logout', authorize, userLogout);
+/// AUTHENTICATION USER LOGOUT ROUTE
+auth.get('/logout', authorize, userLogout);
 
 /// FOR CLIENT SIDE
-route.post(
-  '/check_acc_verify/:userID/:token',
-  authorize,
-  validateVerifyAccountClient
-);
-route.post(
-  '/check_reset_pass/:userID/:token',
-  authorize,
-  validateResetPassClient
-);
+auth.post('/check_acc_verify/:userID/:token', validateVerifyAccountClient);
+auth.post('/check_reset_pass/:id/:token', validateResetPassClient);
 
-module.exports = route;
+module.exports = auth;

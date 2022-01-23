@@ -3,6 +3,17 @@ const USER = require('../models/user');
 const jwt = require('jsonwebtoken');
 
 class Authentication {
+  #generateJWTToken = (user) => {
+    return jwt.sign({ user }, process.env.JWT_SECRET_KEY, {
+      expiresIn: process.env.JWT_TOKEN_EXPIRES_AT,
+    });
+  };
+  #cookieOptions = {
+    maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  };
   constructor() {
     /// AUTHORIZE USER
     this.authorize = async (req, res, next) => {
@@ -26,9 +37,9 @@ class Authentication {
             });
           }
           if (valid) {
-            user = await USER.findById(valid.user._id).select(
-              '+password_changed_at'
-            );
+            user = await USER.findById(valid.user)
+              .select('+password_changed_at')
+              .select('-__v');
             if (!user) {
               return res.status(401).json({
                 status: 'error',
@@ -59,29 +70,21 @@ class Authentication {
     this.userRegister = async (req, res, next) => {
       // REGISTER USER
       await USER.create(
-        filterRequest(req.body, 'firstName', 'lastName', 'password', 'email')
+        filterRequest(req.body, 'firstName', 'lastName', 'email', 'password')
       );
       // GET USER
       const { email } = req.body;
-      const user = await USER.findOne({ email });
+      const user = await USER.findOne({ email }).select('-__v');
       // GENERATE JWT
-      const jwt_token = jwt.sign({ user }, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_AT,
-      });
+      const jwt_token = this.#generateJWTToken(user);
       // SET JWT COOKIE
-      res.cookie('jwt', jwt_token, {
-        maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
-        httpOnly: true,
-        secure: true,
-        // domain: '*',
-        sameSite: 'none',
-      });
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       req.user = user;
       next();
     };
     /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.initAccountVerification = async (req, res, next) => {
-      const user = await USER.findOne(req.user);
+      const user = await USER.findOne(req.user).select('-__v');
       const { otp, token } = await user.initAccontVerification();
       // CONTINUE
       req.userId = user.id;
@@ -92,19 +95,10 @@ class Authentication {
     /// AUTHENTICATION USER LOGIN METHOD
     this.userLogin = async (req, res, next) => {
       const { user } = req;
-
       // GENERATE JWT
-      const jwt_token = jwt.sign({ user }, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_AT,
-      });
+      const jwt_token = this.#generateJWTToken(user);
       // SET JWT COOKIE
-      res.cookie('jwt', jwt_token, {
-        maxAge: 3 * 24 * 60 * 60 * 1000, // would expire after 3 days
-        httpOnly: true,
-        secure: true,
-        // domain: '*',
-        sameSite: 'none',
-      });
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       // SUCCESS RESPONSE
       res.status(200).json({
         status: 'success',
@@ -116,26 +110,21 @@ class Authentication {
     this.reAccountVerification = async (req, res, next) => {
       const user = await USER.findOne(req.user);
       const { otp, token } = await user.initAccontVerification();
-      // SUCCESS RESPONSE
-      res.status(201).json({
-        status: 'success',
-        msg: 'your account verification re-issued successfully ✅.',
-        data: {
-          userID: user._id,
-          otp,
-          token,
-        },
-      });
+      // CONTINUE
+      req.userId = user.id;
+      req.token = token;
+      req.otp = otp;
       next();
     };
     /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
     this.userAccountVerify = async (req, res, next) => {
       const user = await USER.findOne(req.user).select(
-        '+account_verify_otp +account_verify_token +is_account_verified'
+        '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in'
       );
       user.is_account_verified = true;
       user.account_verify_token = undefined;
       user.account_verify_otp = undefined;
+      user.otp_expires_in = undefined;
       user.save({ validateBeforeSave: false });
       return res.status(200).json({
         status: 'success',

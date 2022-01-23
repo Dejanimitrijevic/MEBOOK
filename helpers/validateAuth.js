@@ -17,23 +17,13 @@ class AuthValidate {
         });
       }
       // CHECK IF USER IS ALREADY REGISTERED
-      const user = await USER.findOne({ email: req.body.email });
-      if (user) {
+      if (await USER.findOne({ email: req.body.email })) {
         return res.status(400).json({
           status: 'error',
           msg: 'the entered email address is already registered.',
         });
       }
       for (const value in req.body) {
-        // VALIDATE USER NAME (NAME WITHOUT NUMBERS)
-        if (value.includes('name') || value.includes('Name')) {
-          if (!validator.isAlpha(req.body[value], 'en-US', { ignore: ' ' })) {
-            return res.status(400).json({
-              status: 'error',
-              msg: 'user name can contains only letters (a-z)(A-Z)',
-            });
-          }
-        }
         // VALIDATE USER EMAIL ADDRESS
         if (value.includes('email')) {
           if (!validator.isEmail(req.body.email)) {
@@ -42,14 +32,29 @@ class AuthValidate {
               msg: 'please enter a valid email address.',
             });
           }
-        }
-        // VALIDATE USER PASSWORDS
-        if (value.includes('password') || value.includes('Password')) {
-          if (!validator.isStrongPassword(req.body[value], { minSymbols: 0 })) {
-            return res.status(400).json({
-              status: 'error',
-              msg: 'your password must be at least 8 characters with uppercase and numbers',
-            });
+        } else {
+          // VALIDATE USER PASSWORDS
+          if (value.includes('password') || value.includes('Password')) {
+            if (
+              !validator.isStrongPassword(req.body[value], { minSymbols: 0 })
+            ) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'your password must be at least 8 characters with uppercase and numbers',
+              });
+            }
+          } else {
+            // VALIDATE USER NAME (NAME WITHOUT NUMBERS)
+            if (value.includes('name') || value.includes('Name')) {
+              if (
+                !validator.isAlpha(req.body[value], 'en-US', { ignore: ' ' })
+              ) {
+                return res.status(400).json({
+                  status: 'error',
+                  msg: 'user name can contains only letters (a-z)(A-Z)',
+                });
+              }
+            }
           }
         }
       }
@@ -64,14 +69,14 @@ class AuthValidate {
           msg: 'please enter the required fields to login (email and password)',
         });
       }
-      // CHECK IF USER IS EXIST
+      // CHECK IF USER IS EXIST AND COMPARE PASSWORDS
       const user = await USER.findOne({ email: req.body.email }).select(
         '+password'
       );
       if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
         return res.status(400).json({
           status: 'error',
-          msg: 'the entered email address or password is incorrect.',
+          msg: 'incorrect password or email address.',
         });
       }
       user.password = undefined;
@@ -85,7 +90,7 @@ class AuthValidate {
       try {
         // GET USER BY ID IN REQ PARAMS
         const user = await USER.findById(userID).select(
-          '+account_verify_otp +account_verify_token +is_account_verified'
+          '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in'
         );
         // IF NO USER EXIST WITH THIS ID
         if (!user) {
@@ -94,14 +99,21 @@ class AuthValidate {
             msg: 'invalid or expired account verification token, try request again.',
           });
         }
-
-        // IF TOKENS IN NOT MATCHED (INVALID OR EXPIRED)
+        // IF TOKENS ARE NOT MATCHED (INVALID OR EXPIRED)
         if (!(await bcrypt.compare(token, user.account_verify_token))) {
           return res.status(400).json({
             status: 'error',
             msg: 'invalid or expired account verification token, try request again.',
           });
         }
+        // CHECK IF TOKEN IS STILL VALID
+        if (Date.parse(user.otp_expires_in) < Date.now()) {
+          return res.status(401).json({
+            status: 'error',
+            msg: 'your account verification token is expired, try request again.',
+          });
+        }
+        // CHECK IF ACCOUNT IS ALREADY VERIFIED
         if (user && user.is_account_verified) {
           return res.status(400).json({
             status: 'error',
@@ -206,7 +218,7 @@ class AuthValidate {
       const { id, token } = req.params;
       try {
         const user = await USER.findById(id).select(
-          '+reset_password_token +password'
+          '+reset_password_token +password +reset_token_expires_in'
         );
         if (!user) {
           return res.status(400).json({
@@ -221,6 +233,13 @@ class AuthValidate {
               msg: 'invalid or expired reset password token, try request again.',
             });
           } else {
+            // CHECK IF TOKEN IS STILL VALID
+            if (Date.parse(user.reset_token_expires_in) < Date.now()) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'your password reset token is expired, try request again.',
+              });
+            }
             // CHECK FOR NEEDED DATA
             if (
               isDataMissed(req.body, 'newPassword', 'newPasswordConfirmation')
@@ -241,7 +260,7 @@ class AuthValidate {
             if (newPassword !== newPasswordConfirmation) {
               return res.status(400).json({
                 status: 'error',
-                msg: 'password and password confirmation are not the same.',
+                msg: 'password and password confirmation are not the same!',
               });
             }
             req.user = user;
@@ -260,7 +279,9 @@ class AuthValidate {
     this.validateResetPassClient = async (req, res, next) => {
       const { id, token } = req.params;
       try {
-        const user = await USER.findById(id).select('+reset_password_token');
+        const user = await USER.findById(id).select(
+          '+reset_password_token +reset_token_expires_in'
+        );
         if (!user) {
           return res.status(400).json({
             status: 'error',
@@ -274,6 +295,13 @@ class AuthValidate {
               msg: 'invalid or expired reset password token, try request again.',
             });
           }
+        }
+        // CHECK IF TOKEN IS STILL VALID
+        if (Date.parse(user.reset_token_expires_in) < Date.now()) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'your password reset token is expired, try request again.',
+          });
         }
         return res.status(200).json({
           status: 'success',
