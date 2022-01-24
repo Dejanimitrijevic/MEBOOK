@@ -11,7 +11,7 @@ class Authentication {
   #cookieOptions = {
     maxAge: 3600000,
     httpOnly: false,
-    secure: false,
+    secure: true,
     sameSite: 'none',
   };
   constructor() {
