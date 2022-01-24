@@ -165,8 +165,7 @@ class Authentication {
     };
     /// AUTHENTICATION USER LOGOUT METHOD
     this.userLogout = async (req, res, next) => {
-      res.cookie('jwt', undefined, undefined);
-      res.clearCookie('jwt');
+      res.clearCookie('jwt', { ...this.#cookieOptions, maxAge: 0 });
       res.status(200).json({
         status: 'success',
         msg: 'logged out successfully ✅.',
