@@ -15,6 +15,10 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', '*');
   res.header('Access-Control-Allow-Headers', '*');
+  res.set(
+    'Access-Control-Expose-Headers',
+    'date, etag, access-control-allow-origin, access-control-allow-credentials'
+  );
   next();
 });
 app.use(express.json());
