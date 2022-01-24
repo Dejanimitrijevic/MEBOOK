@@ -8,6 +8,12 @@ class Authentication {
       expiresIn: process.env.JWT_TOKEN_EXPIRES_AT,
     });
   };
+  #cookieOptions = {
+    maxAge: 3600000,
+    httpOnly: false,
+    secure: false,
+    sameSite: 'none',
+  };
   constructor() {
     /// AUTHORIZE USER
     this.authorize = async (req, res, next) => {
@@ -92,6 +98,7 @@ class Authentication {
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
       // SUCCESS RESPONSE
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       return res.status(200).json({
         status: 'success',
         msg: 'logged in successfully ✅.',
