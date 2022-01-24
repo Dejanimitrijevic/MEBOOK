@@ -1,5 +1,5 @@
 const express = require('express');
-const morgan = require('morgan');
+// const morgan = require('morgan');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const api = require('./routes/api');
@@ -19,9 +19,9 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(express.json());
-if(process.env.NODE_ENV === 'development'){
-  app.use(morgan('dev'));
-}
+// if(process.env.NODE_ENV === 'development'){
+// app.use(morgan('dev'));
+// }
 app.use(cookieParser());
 
 /// API ROUTE
