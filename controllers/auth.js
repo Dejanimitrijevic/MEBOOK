@@ -8,11 +8,15 @@ class Authentication {
       expiresIn: process.env.JWT_TOKEN_EXPIRES_AT,
     });
   };
+  #domain =
+    process.env.NODE_ENV === 'production'
+      ? 'mebook-app.netlify.app'
+      : 'localhost';
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
     httpOnly: false,
     secure: true,
-    domain: 'localhost',
+    domain: this.#domain,
     sameSite: 'none',
   };
   constructor() {
