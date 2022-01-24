@@ -13,6 +13,7 @@ class Authentication {
     httpOnly: false,
     secure: true,
     sameSite: 'none',
+    sameParty: 'none',
   };
   constructor() {
     /// AUTHORIZE USER
