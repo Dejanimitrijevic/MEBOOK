@@ -19,7 +19,9 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(express.json());
-app.use(morgan('dev'));
+if(process.env.NODE_ENV === 'development'){
+  app.use(morgan('dev'));
+}
 app.use(cookieParser());
 
 /// API ROUTE
