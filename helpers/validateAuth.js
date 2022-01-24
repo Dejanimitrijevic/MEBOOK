@@ -159,23 +159,14 @@ class AuthValidate {
         );
         // IF NO USER EXIST WITH THIS ID
         if (!user) {
-          return res.status(403).json({
-            status: 'error',
-            msg: 'invalid or expired account verification token, try request again.',
-          });
+          return res.status(403).send();
         }
         // IF TOKENS IN NOT MATCHED (INVALID OR EXPIRED)
         if (!(await bcrypt.compare(token, user.account_verify_token))) {
-          return res.status(403).json({
-            status: 'error',
-            msg: 'invalid or expired account verification token, try request again.',
-          });
+          return res.status(403).send();
         }
         if (user && user.is_account_verified) {
-          return res.status(403).json({
-            status: 'error',
-            msg: 'your account is already verified.',
-          });
+          return res.status(403).send();
         }
         // GET USER
         user = await USER.findById(userID);
@@ -183,10 +174,7 @@ class AuthValidate {
           user,
         });
       } catch (error) {
-        return res.status(403).json({
-          status: 'error',
-          msg: 'invalid or expired account verification token, try request again.',
-        });
+        return res.status(403).send();
       }
     };
     /// VALIDATE USER ACCOUNT RE_VERIFICATION PROCESS
@@ -283,25 +271,16 @@ class AuthValidate {
           '+reset_password_token +reset_token_expires_in'
         );
         if (!user) {
-          return res.status(400).json({
-            status: 'error',
-            msg: 'invalid or expired reset password token, try request again.',
-          });
+          return res.status(403).send();
         }
         if (user) {
           if (!(await bcrypt.compare(token, user.reset_password_token))) {
-            return res.status(400).json({
-              status: 'error',
-              msg: 'invalid or expired reset password token, try request again.',
-            });
+            return res.status(403).send();
           }
         }
         // CHECK IF TOKEN IS STILL VALID
         if (Date.parse(user.reset_token_expires_in) < Date.now()) {
-          return res.status(400).json({
-            status: 'error',
-            msg: 'your password reset token is expired, try request again.',
-          });
+          return res.status(403).send();
         }
         return res.status(200).json({
           status: 'success',
@@ -309,10 +288,7 @@ class AuthValidate {
           user,
         });
       } catch (error) {
-        return res.status(400).json({
-          status: 'error',
-          msg: 'invalid or expired reset password token, try request again.',
-        });
+        return res.status(403).send();
       }
     };
   }

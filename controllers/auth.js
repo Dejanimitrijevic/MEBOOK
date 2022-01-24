@@ -10,7 +10,7 @@ class Authentication {
   };
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite: 'none',
   };
@@ -100,7 +100,7 @@ class Authentication {
       // SET JWT COOKIE
       res.cookie('jwt', jwt_token, this.#cookieOptions);
       // SUCCESS RESPONSE
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
         msg: 'logged in successfully ✅.',
       });
@@ -118,14 +118,19 @@ class Authentication {
     };
     /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
     this.userAccountVerify = async (req, res, next) => {
-      const user = await USER.findOne(req.user).select(
-        '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in'
+      let user;
+      user = await USER.findOne(req.user).select(
+        '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in -__v'
       );
       user.is_account_verified = true;
       user.account_verify_token = undefined;
       user.account_verify_otp = undefined;
       user.otp_expires_in = undefined;
-      user.save({ validateBeforeSave: false });
+      await user.save({ validateBeforeSave: false });
+      // GENERATE JWT
+      const jwt_token = this.#generateJWTToken(user);
+      // SET JWT COOKIE
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       return res.status(200).json({
         status: 'success',
         msg: 'your account verified successfully ✅.',
@@ -158,7 +163,7 @@ class Authentication {
     /// AUTHENTICATION USER LOGOUT METHOD
     this.userLogout = async (req, res, next) => {
       res.cookie('jwt', undefined);
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
         msg: 'logged out successfully ✅.',
       });

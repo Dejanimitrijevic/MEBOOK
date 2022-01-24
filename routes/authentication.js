@@ -80,7 +80,7 @@ auth.post(
 );
 
 /// AUTHENTICATION USER LOGOUT ROUTE
-auth.get('/logout', authorize, userLogout);
+auth.get('/logout', userLogout);
 
 /// FOR CLIENT SIDE
 auth.post('/check_acc_verify/:userID/:token', validateVerifyAccountClient);
