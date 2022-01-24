@@ -130,7 +130,6 @@ class Authentication {
       req.user = user;
       next();
     };
-
     /// AUTHENTICATION RE_INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.reAccountVerification = async (req, res, next) => {
       const user = await USER.findOne(req.user);
@@ -141,7 +140,6 @@ class Authentication {
       req.otp = otp;
       next();
     };
-
     /// AUTHENTICATION  USER FORGOT PASSWORD
     this.userForgotPassword = async (req, res, next) => {
       const user = await USER.findOne(req.user);
@@ -160,16 +158,15 @@ class Authentication {
       user.password = req.password;
       user.reset_password_token = undefined;
       user.save({ validateBeforeSave: false });
-
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
         msg: 'your password has been reset successfully ✅.',
       });
     };
     /// AUTHENTICATION USER LOGOUT METHOD
     this.userLogout = async (req, res, next) => {
-      res.cookie('jwt', undefined);
-      return res.status(200).json({
+      res.cookie('jwt', '', {});
+      res.status(200).json({
         status: 'success',
         msg: 'logged out successfully ✅.',
       });
