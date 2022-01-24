@@ -4,7 +4,7 @@ class ControlEmails {
   constructor() {
     /// ACCOUNT VERIFICATION OTP EMAIL
     this.sendAccVerification = async (req, res) => {
-      const { user, userId, token, otp } = req;
+      const { user, userId, token, otp, jwt } = req;
       // SEND EMAIL
       sendEmail(user.email, 'otp', { otp });
       // SUCCESS RESPONSE
@@ -14,6 +14,7 @@ class ControlEmails {
         data: {
           userId,
           token,
+          jwt,
         },
       });
     };

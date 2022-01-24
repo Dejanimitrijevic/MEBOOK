@@ -8,13 +8,6 @@ class Authentication {
       expiresIn: process.env.JWT_TOKEN_EXPIRES_AT,
     });
   };
-  #cookieOptions = {
-    maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
-    httpOnly: false,
-    secure: true,
-    sameSite: 'none',
-    domain: 'mebook-server.herokuapp.com',
-  };
   constructor() {
     /// AUTHORIZE USER
     this.authorize = async (req, res, next) => {
@@ -79,7 +72,7 @@ class Authentication {
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
       // SET JWT COOKIE
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
+      req.jwt = jwt_token;
       req.user = user;
       next();
     };
@@ -98,12 +91,13 @@ class Authentication {
       const { user } = req;
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
-      // SET JWT COOKIE
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
       // SUCCESS RESPONSE
       return res.status(200).json({
         status: 'success',
         msg: 'logged in successfully ✅.',
+        data: {
+          jwt: jwt_token,
+        },
       });
     };
 
@@ -130,11 +124,12 @@ class Authentication {
       await user.save({ validateBeforeSave: false });
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
-      // SET JWT COOKIE
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
       return res.status(200).json({
         status: 'success',
         msg: 'your account verified successfully ✅.',
+        data: {
+          jwt: jwt_token,
+        },
       });
     };
     /// AUTHENTICATION  USER FORGOT PASSWORD
