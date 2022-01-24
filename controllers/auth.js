@@ -77,6 +77,8 @@ class Authentication {
       const user = await USER.findOne({ email }).select('-__v');
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
+
       // SET JWT COOKIE
       req.jwt = jwt_token;
       req.user = user;
@@ -131,6 +133,8 @@ class Authentication {
       await user.save({ validateBeforeSave: false });
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
+
       return res.status(200).json({
         status: 'success',
         msg: 'your account verified successfully ✅.',
