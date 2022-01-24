@@ -10,11 +10,74 @@ class Authentication {
   };
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
-    httpOnly: false,
+    httpOnly: true,
     secure: true,
     sameSite: 'none',
   };
   constructor() {
+    /// AUTHENTICATION USER REGISTER METHOD
+    this.userRegister = async (req, res, next) => {
+      // REGISTER USER
+      await USER.create(
+        filterRequest(req.body, 'firstName', 'lastName', 'email', 'password')
+      );
+      // GET USER
+      const { email } = req.body;
+      const user = await USER.findOne({ email });
+      // GENERATE JWT
+      const jwt_token = this.#generateJWTToken(user);
+      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      // CONTINUE
+      req.jwt = jwt_token;
+      req.user = user;
+      next();
+    };
+    /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
+    this.initAccountVerification = async (req, res, next) => {
+      const user = await USER.findOne(req.user);
+      const { otp, token } = await user.initAccontVerification();
+      // CONTINUE
+      req.userId = user.id;
+      req.token = token;
+      req.otp = otp;
+      next();
+    };
+    /// AUTHENTICATION USER LOGIN METHOD
+    this.userLogin = async (req, res) => {
+      const { user } = req;
+      // GENERATE JWT
+      const jwt_token = this.#generateJWTToken(user);
+      // SUCCESS RESPONSE
+      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      res.status(201).json({
+        status: 'success',
+        msg: 'logged in successfully ✅.',
+        data: {
+          jwt: jwt_token,
+        },
+      });
+    };
+    /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
+    this.userAccountVerify = async (req, res, next) => {
+      const user = await USER.findOne(req.user).select(
+        '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in -__v'
+      );
+      user.is_account_verified = true;
+      user.account_verify_token = undefined;
+      user.account_verify_otp = undefined;
+      user.otp_expires_in = undefined;
+      await user.save({ validateBeforeSave: false });
+      // GENERATE JWT
+      const jwt_token = this.#generateJWTToken(user);
+      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      res.status(201).json({
+        status: 'success',
+        msg: 'your account verified successfully ✅.',
+        data: {
+          jwt: jwt_token,
+        },
+      });
+    };
     /// AUTHORIZE USER
     this.authorize = async (req, res, next) => {
       let user;
@@ -37,9 +100,10 @@ class Authentication {
             });
           }
           if (valid) {
-            user = await USER.findById(valid.user)
-              .select('+password_changed_at')
-              .select('-__v');
+            user = await USER.findById(valid.user).select(
+              '+password_changed_at'
+            );
+
             if (!user) {
               return res.status(401).json({
                 status: 'error',
@@ -66,49 +130,6 @@ class Authentication {
       req.user = user;
       next();
     };
-    /// AUTHENTICATION USER REGISTER METHOD
-    this.userRegister = async (req, res, next) => {
-      // REGISTER USER
-      await USER.create(
-        filterRequest(req.body, 'firstName', 'lastName', 'email', 'password')
-      );
-      // GET USER
-      const { email } = req.body;
-      const user = await USER.findOne({ email }).select('-__v');
-      // GENERATE JWT
-      const jwt_token = this.#generateJWTToken(user);
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
-
-      // SET JWT COOKIE
-      req.jwt = jwt_token;
-      req.user = user;
-      next();
-    };
-    /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
-    this.initAccountVerification = async (req, res, next) => {
-      const user = await USER.findOne(req.user).select('-__v');
-      const { otp, token } = await user.initAccontVerification();
-      // CONTINUE
-      req.userId = user.id;
-      req.token = token;
-      req.otp = otp;
-      next();
-    };
-    /// AUTHENTICATION USER LOGIN METHOD
-    this.userLogin = async (req, res, next) => {
-      const { user } = req;
-      // GENERATE JWT
-      const jwt_token = this.#generateJWTToken(user);
-      // SUCCESS RESPONSE
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
-      return res.status(200).json({
-        status: 'success',
-        msg: 'logged in successfully ✅.',
-        data: {
-          jwt: jwt_token,
-        },
-      });
-    };
 
     /// AUTHENTICATION RE_INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.reAccountVerification = async (req, res, next) => {
@@ -120,29 +141,7 @@ class Authentication {
       req.otp = otp;
       next();
     };
-    /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
-    this.userAccountVerify = async (req, res, next) => {
-      let user;
-      user = await USER.findOne(req.user).select(
-        '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in -__v'
-      );
-      user.is_account_verified = true;
-      user.account_verify_token = undefined;
-      user.account_verify_otp = undefined;
-      user.otp_expires_in = undefined;
-      await user.save({ validateBeforeSave: false });
-      // GENERATE JWT
-      const jwt_token = this.#generateJWTToken(user);
-      res.cookie('jwt', jwt_token, this.#cookieOptions);
 
-      return res.status(200).json({
-        status: 'success',
-        msg: 'your account verified successfully ✅.',
-        data: {
-          jwt: jwt_token,
-        },
-      });
-    };
     /// AUTHENTICATION  USER FORGOT PASSWORD
     this.userForgotPassword = async (req, res, next) => {
       const user = await USER.findOne(req.user);
