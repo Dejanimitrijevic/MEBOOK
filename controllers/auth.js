@@ -11,7 +11,7 @@ class Authentication {
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
     httpOnly: false,
-    secure: true,
+    secure: false,
     sameSite: 'none',
   };
   constructor() {
