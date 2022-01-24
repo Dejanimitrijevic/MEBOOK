@@ -26,7 +26,7 @@ class Authentication {
       const user = await USER.findOne({ email });
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
-      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       // CONTINUE
       req.jwt = jwt_token;
       req.user = user;
@@ -48,7 +48,7 @@ class Authentication {
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
       // SUCCESS RESPONSE
-      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       res.status(201).json({
         status: 'success',
         msg: 'logged in successfully ✅.',
@@ -69,7 +69,7 @@ class Authentication {
       await user.save({ validateBeforeSave: false });
       // GENERATE JWT
       const jwt_token = this.#generateJWTToken(user);
-      // res.cookie('jwt', jwt_token, this.#cookieOptions);
+      res.cookie('jwt', jwt_token, this.#cookieOptions);
       res.status(201).json({
         status: 'success',
         msg: 'your account verified successfully ✅.',
