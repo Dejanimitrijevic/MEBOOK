@@ -9,7 +9,7 @@ class Authentication {
     });
   };
   #cookieOptions = {
-    maxAge: 3600000,
+    maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
     httpOnly: false,
     secure: true,
     sameSite: 'none',
