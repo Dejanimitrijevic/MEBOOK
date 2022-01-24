@@ -13,7 +13,7 @@ class Authentication {
     httpOnly: false,
     secure: true,
     sameSite: 'none',
-    domain: 'mebook-app.netlify.app',
+    domain: 'mebook-server.herokuapp.com',
   };
   constructor() {
     /// AUTHORIZE USER
