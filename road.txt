@@ -1,0 +1,47 @@
+books categories ( 7 Categories ) with 5 sub-categories with 10 books
+add book - delete book - edit book - get book ( CRUD )
+add categories - delete categories - edit categories - get categories ( CRUD )
+
+>>> CATEGORIES:
+    1+ computer & technology :
+        # computer science
+        # computer graphics & design
+        # web development & design
+        # programming languages
+        # internet & social media
+        # networking & cloud computing
+    2+ Health, fitness & dieting :
+        # health recovery
+        # exercise & fitness
+        # sports health & safety
+        # children's health
+        # mental health
+    3+ science fiction & fantasy :
+        # science fiction
+        # fantasy
+        # gaming
+        # writing
+    4+ sports & outdoors :
+        # basketball
+        # football
+        # sports coaching
+        # sports training
+        # individual sports
+    5+ romance :
+        # romantic action & adventure
+        # historical romances
+        # sports romance
+        # western romances
+        # military romance
+    6+ literature & fiction :
+        # action & adventure fiction
+        # world literature
+        # historical fiction
+        # dramas & plays
+        # ancient & medieval literature
+    7+ medical books :
+        # basic medical sciences
+        # medical informatics
+        # dentistry
+        # nursing
+        # pharmacology

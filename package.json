@@ -32,6 +32,7 @@
     "passport": "^0.5.2",
     "pug": "^3.0.2",
     "randomatic": "^3.1.1",
+    "slugify": "^1.6.5",
     "validator": "^13.7.0"
   },
   "devDependencies": {

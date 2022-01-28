@@ -12,6 +12,5 @@ module.exports = (req, res, next) => {
     if (value === 'email')
       req.body.email = validator.normalizeEmail(req.body.email);
   }
-
   next();
 };

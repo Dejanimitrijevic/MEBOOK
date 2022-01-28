@@ -1,0 +1,43 @@
+[
+  { "title": "computer science" },
+  { "title": "computer graphics & design" },
+  { "title": "web development & design" },
+  { "title": "programming languages" },
+  { "title": "internet & social media" },
+  { "title": "networking & cloud computing" },
+
+  { "title": "health recovery" },
+  { "title": "exercise & fitness" },
+  { "title": "sports health & safety" },
+  { "title": "children's health" },
+  { "title": "mental health" },
+
+  { "title": "science fiction" },
+  { "title": "fantasy" },
+  { "title": "gaming" },
+  { "title": "writing" },
+
+  { "title": "basketball" },
+  { "title": "football" },
+  { "title": "sports coaching" },
+  { "title": "sports training" },
+  { "title": "individual sports" },
+
+  { "title": "romantic action & adventure" },
+  { "title": "historical romances" },
+  { "title": "sports romance" },
+  { "title": "western romances" },
+  { "title": "military romance" },
+
+  { "title": "action & adventure fiction" },
+  { "title": "world literature" },
+  { "title": "historical fiction" },
+  { "title": "dramas & plays" },
+  { "title": "ancient & medieval literature" },
+
+  { "title": "basic medical sciences" },
+  { "title": "medical informatics" },
+  { "title": "dentistry" },
+  { "title": "nursing" },
+  { "title": "pharmacology" }
+]

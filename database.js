@@ -8,11 +8,25 @@ if (process.env.NODE_ENV === 'production') {
   DB_URL = process.env.HOSTED_MONGO_DB_URL;
 }
 
-mongoose
-  .connect(DB_URL)
-  .then(() => {
-    console.log(`DB CONNECTED ✅`);
-  })
-  .catch(() => {
-    console.log(`DB ERROR ⛔`);
-  });
+class DatabaseOperations {
+  constructor() {
+    // CONNECT APP DATABASE
+    this.connectDB = () => {
+      mongoose
+        .connect(DB_URL)
+        .then(() => {
+          console.log(`DB CONNECTED ✅`);
+        })
+        .catch(() => {
+          console.log(`DB ERROR ⛔`);
+        });
+    };
+    // EXPORT DATA TO DB COLLECTION
+    this.updateDbCollection = async (collection, data) => {
+      await collection.create(data);
+      console.log('DONE');
+    };
+  }
+}
+
+module.exports = new DatabaseOperations();
