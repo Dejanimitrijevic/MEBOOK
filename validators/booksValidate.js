@@ -1,5 +1,6 @@
 const validator = require('validator');
 const BOOK = require('../models/book');
+const USER = require('../models/user');
 const isDataMissed = require('../helpers/checkRequestData');
 
 class BooksValidator {
@@ -22,6 +23,33 @@ class BooksValidator {
       }
       // CONTINUE
       next();
+    };
+    // VALIDATE ADD BOOK TO USER WISHLIST
+    this.validateAddToWishList = async (req, res, next) => {
+      // GET USER ID AND BOOK ID FROM REQUEST BODY
+      const { bookId } = req.body;
+      if (!bookId) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'please enter book id.',
+        });
+      }
+      try {
+        const book = await BOOK.findById(bookId);
+        if (!book) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'no book found with this id.',
+          });
+        }
+        req.bookID = book._id;
+        next();
+      } catch (error) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'no book found with this id.',
+        });
+      }
     };
   }
 }

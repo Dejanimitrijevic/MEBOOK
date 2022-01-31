@@ -14,7 +14,7 @@ class ControlEmails {
         data: {
           userId,
           token,
-          jwt,
+          user,
         },
       });
     };

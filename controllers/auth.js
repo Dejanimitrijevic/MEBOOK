@@ -53,7 +53,7 @@ class Authentication {
         status: 'success',
         msg: 'logged in successfully ✅.',
         data: {
-          jwt: jwt_token,
+          user
         },
       });
     };
@@ -74,7 +74,7 @@ class Authentication {
         status: 'success',
         msg: 'your account verified successfully ✅.',
         data: {
-          jwt: jwt_token,
+          user
         },
       });
     };
