@@ -1,12 +1,17 @@
 const BOOK = require('../models/book');
 const USER = require('../models/user');
-const jwt = require('jsonwebtoken');
+const APIFeatures = require('../utils/apiFeatures');
 
 class BookOperations {
   constructor() {
     // GET ALL BOOKS
     this.getAll = async (req, res, next) => {
-      const books = await BOOK.find();
+      const features = new APIFeatures(BOOK.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+      const books = await features.query;
       res.status(200).json({
         status: 'success',
         books,
@@ -25,7 +30,7 @@ class BookOperations {
     };
     // ADD BOOK TO USER WISHLIST
     this.addToWishlist = async (req, res, next) => {
-      const { bookID } = req;
+      const { bookID, bookTitle } = req;
       const user = await USER.findOne(req.user).select('+wishlist');
 
       if (!user.wishlist.includes(bookID)) {
@@ -33,7 +38,7 @@ class BookOperations {
         await user.save({ validateBeforeSave: false });
         res.status(200).json({
           status: 'success',
-          msg: 'added to your wishlist ✅.',
+          msg: `${bookTitle} added to your wishlist ✅.`,
           data: { user },
         });
       } else if (user.wishlist.includes(bookID)) {
@@ -46,7 +51,7 @@ class BookOperations {
         await user.save({ validateBeforeSave: false });
         res.status(200).json({
           status: 'success',
-          msg: 'removed from your wishlist ✅.',
+          msg: `${bookTitle} removed from your wishlist ✅.`,
           data: { user },
         });
       }

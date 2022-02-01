@@ -43,6 +43,7 @@ class BooksValidator {
           });
         }
         req.bookID = book._id;
+        req.bookTitle = book.title;
         next();
       } catch (error) {
         return res.status(400).json({

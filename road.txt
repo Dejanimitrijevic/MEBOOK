@@ -1,47 +1,52 @@
-books categories ( 7 Categories ) with 5 sub-categories with 10 books
-add book - delete book - edit book - get book ( CRUD )
-add categories - delete categories - edit categories - get categories ( CRUD )
+books categories ( 7 Categories ) with 5 sub-categories with 10 books (TOTAL 350 NOW 14)
+add 2 books for each sub_category manually and 8 with dashboard
 
 >>> CATEGORIES:
-    1+ computer & technology :
-        # computer science
-        # computer graphics & design
+    1+ computers & technology (2) :
+        # computer science (1)
+        # graphics & design (1)
         # web development & design
         # programming languages
         # internet & social media
         # networking & cloud computing
-    2+ Health, fitness & dieting :
-        # health recovery
-        # exercise & fitness
+
+    2+ health, fitness & dieting (2) :
+        # health recovery (1)
+        # exercise & fitness (1)
         # sports health & safety
         # children's health
         # mental health
-    3+ science fiction & fantasy :
-        # science fiction
-        # fantasy
+
+    3+ science fiction & fantasy (2) :
+        # science fiction (1)
+        # fantasy (1)
         # gaming
         # writing
-    4+ sports & outdoors :
-        # basketball
-        # football
+
+    4+ sports & outdoors (2) :
+        # basketball (1)
+        # football (1)
         # sports coaching
         # sports training
         # individual sports
-    5+ romance :
-        # romantic action & adventure
-        # historical romances
+
+    5+ romance (2) :
+        # action & adventure (1)
+        # historical romances (1)
         # sports romance
         # western romances
         # military romance
-    6+ literature & fiction :
-        # action & adventure fiction
-        # world literature
+
+    6+ literature & fiction (2) :
+        # action & adventure fiction (1)
+        # world literature (1)
         # historical fiction
         # dramas & plays
         # ancient & medieval literature
-    7+ medical books :
-        # basic medical sciences
-        # medical informatics
+
+    7+ medical books (2) :
+        # basic medical sciences (1)
+        # medical informatics (1)
         # dentistry
         # nursing
         # pharmacology
