@@ -58,21 +58,23 @@ class BookOperations {
     };
     // ADD BOOK TO USER CART
     this.addToCart = async (req, res, next) => {
-      const { bookID, bookTitle } = req;
+      const { bookID, bookTitle, bookPrice } = req;
       const { quantity } = req.body;
       const user = await USER.findById(req.user._id);
-      // .populate('cart.items.item')
-      // .exec();
       if (
         !user.cart.items.length ||
         !user.cart.items.find((item) => {
-          return String(item.item) === String(bookID);
+          return String(item.item.id) === String(bookID);
         })
       ) {
-        user.cart.items.push({ item: bookID, quantity: quantity || 1 });
+        user.cart.items.push({
+          item: bookID,
+          subtotal: +bookPrice,
+          quantity: quantity || 1,
+        });
       } else {
         user.cart.items.find((item) => {
-          if (String(item.item) === String(bookID)) {
+          if (String(item.item.id) === String(bookID)) {
             item.quantity += 1;
           }
         });

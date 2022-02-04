@@ -44,6 +44,7 @@ class BooksValidator {
         }
         req.bookID = book._id;
         req.bookTitle = book.title;
+        req.bookPrice = book.price;
         next();
       } catch (error) {
         return res.status(400).json({

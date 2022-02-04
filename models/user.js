@@ -23,6 +23,7 @@ const userSchema = new Schema({
       {
         item: { type: Schema.Types.ObjectId, ref: 'BOOK' },
         quantity: { type: Number, default: 1 },
+        subtotal: { type: Number },
       },
     ],
   },
@@ -54,16 +55,37 @@ userSchema.pre(/^save/, async function () {
 });
 
 userSchema.pre(/^save/, async function () {
-  if (this.isModified('cart')) {
+  if (this.isNew || this.isModified('cart')) {
+    //@ CALCULATE TOTAL CART ITEMS COUNT
     const items_count = this.cart.items
       .map((el) => {
         return el.quantity;
       })
       .reduce((cur, next) => {
         return cur + next;
-      });
+      }, 0);
     this.cart.items_count = items_count;
+    //@ CALCULATE CART ITEM SUBTOTAL
+    this.cart.items.forEach((el) => {
+      el.subtotal = +el.quantity * +el.item.price;
+    });
+    //@ CALCULATE CART TOTAL
+    const total = this.cart.items
+      .map((el) => {
+        return el.subtotal;
+      })
+      .reduce((cur, next) => {
+        return cur + next;
+      }, 0);
+    this.cart.total = total;
   }
+});
+
+userSchema.pre(/^find/, async function () {
+  this.populate('cart.items.item');
+});
+userSchema.pre(/^save/, async function () {
+  this.populate('cart.items.item');
 });
 
 // USER SCHEMA METHODS

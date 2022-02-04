@@ -34,7 +34,8 @@ class Authentication {
     };
     /// AUTHENTICATION INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.initAccountVerification = async (req, res, next) => {
-      const user = await USER.findOne(req.user);
+      const { id } = req.user;
+      const user = await USER.findById(id);
       const { otp, token } = await user.initAccontVerification();
       // CONTINUE
       req.userId = user.id;
@@ -59,7 +60,8 @@ class Authentication {
     };
     /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
     this.userAccountVerify = async (req, res, next) => {
-      const user = await USER.findOne(req.user).select(
+      const { id } = req.user;
+      const user = await USER.findById(id).select(
         '+account_verify_otp +account_verify_token +is_account_verified +otp_expires_in -__v'
       );
       user.is_account_verified = true;
@@ -109,12 +111,15 @@ class Authentication {
               });
             }
             if (user) {
-              if (Date.parse(user.password_changed_at) > valid.iat * 1000) {
-                return res.status(401).json({
-                  status: 'error',
-                  msg: 'password changed after session is issued, try login again.',
-                });
-              }
+              // if (
+              //   user.password_changed_at &&
+              //   Date.parse(user.password_changed_at) > valid.iat * 1000
+              // ) {
+              //   return res.status(401).json({
+              //     status: 'error',
+              //     msg: 'password changed after session is issued, try login again.',
+              //   });
+              // }
             }
           }
         } catch (error) {
@@ -130,7 +135,8 @@ class Authentication {
     };
     /// AUTHENTICATION RE_INITIALIZE USER ACCOUNT VERIFICATION METHOD
     this.reAccountVerification = async (req, res, next) => {
-      const user = await USER.findOne(req.user);
+      const { id } = req.user;
+      const user = await USER.findById(id);
       const { otp, token } = await user.initAccontVerification();
       // CONTINUE
       req.userId = user.id;
@@ -140,7 +146,8 @@ class Authentication {
     };
     /// AUTHENTICATION  USER FORGOT PASSWORD
     this.userForgotPassword = async (req, res, next) => {
-      const user = await USER.findOne(req.user);
+      const { id } = req.user;
+      const user = await USER.findById(id);
       const token = await user.initForgotPassword();
       // CONTINUE
       req.token = token;
@@ -150,7 +157,8 @@ class Authentication {
     };
     /// AUTHENTICATION  USER RESET PASSWORD
     this.userResetPassword = async (req, res, next) => {
-      const user = await USER.findOne(req.user).select(
+      const { id } = req.user;
+      const user = await USER.findById(id).select(
         '+password +reset_password_token'
       );
       user.password = req.password;

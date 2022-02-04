@@ -179,7 +179,8 @@ class AuthValidate {
     };
     /// VALIDATE USER ACCOUNT RE_VERIFICATION PROCESS
     this.validateReVerify = async (req, res, next) => {
-      const user = await USER.findOne(req.user).select('+is_account_verified');
+      const { id } = req.user;
+      const user = await USER.findById(id).select('+is_account_verified');
       if (user && user.is_account_verified) {
         return res.status(400).json({
           status: 'error',
