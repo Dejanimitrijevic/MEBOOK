@@ -53,7 +53,7 @@ class Authentication {
         status: 'success',
         msg: 'logged in successfully ✅.',
         data: {
-          user
+          user,
         },
       });
     };
@@ -74,14 +74,14 @@ class Authentication {
         status: 'success',
         msg: 'your account verified successfully ✅.',
         data: {
-          user
+          user,
         },
       });
     };
     /// AUTHORIZE USER
     this.authorize = async (req, res, next) => {
-      let user;
       const token = req.cookies['jwt'];
+      let user;
       // CHECK IF NO TOKEN
       if (!token) {
         return res.status(401).json({
@@ -100,10 +100,8 @@ class Authentication {
             });
           }
           if (valid) {
-            user = await USER.findById(valid.user).select(
-              '+password_changed_at'
-            );
-
+            const id = valid.user._id;
+            user = await USER.findById(id).select('+password_changed_at');
             if (!user) {
               return res.status(401).json({
                 status: 'error',

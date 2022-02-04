@@ -31,7 +31,7 @@ class BookOperations {
     // ADD BOOK TO USER WISHLIST
     this.addToWishlist = async (req, res, next) => {
       const { bookID, bookTitle } = req;
-      const user = await USER.findOne(req.user).select('+wishlist');
+      const user = await USER.findById(req.user._id);
 
       if (!user.wishlist.includes(bookID)) {
         user.wishlist.push(bookID);
@@ -55,6 +55,47 @@ class BookOperations {
           data: { user },
         });
       }
+    };
+    // ADD BOOK TO USER CART
+    this.addToCart = async (req, res, next) => {
+      const { bookID, bookTitle } = req;
+      const { quantity } = req.body;
+      const user = await USER.findById(req.user._id);
+      // .populate('cart.items.item')
+      // .exec();
+      if (
+        !user.cart.items.length ||
+        !user.cart.items.find((item) => {
+          return String(item.item) === String(bookID);
+        })
+      ) {
+        user.cart.items.push({ item: bookID, quantity: quantity || 1 });
+      } else {
+        user.cart.items.find((item) => {
+          if (String(item.item) === String(bookID)) {
+            item.quantity += 1;
+          }
+        });
+      }
+      await user.save({ validateBeforeSave: false });
+      res.status(200).json({
+        status: 'success',
+        msg: `${bookTitle} added to your shopping cart ✅.`,
+        data: { user },
+      });
+    };
+    // REMOVR BOOK FROM USER CART
+    this.removeFromCart = async (req, res, next) => {
+      const { itemId, user } = req;
+      user.cart.items = user.cart.items.filter((item) => {
+        return item.id !== itemId;
+      });
+      await user.save({ validateBeforeSave: false });
+      res.status(200).json({
+        status: 'success',
+        msg: `item removed from your shopping cart ✅.`,
+        data: { user },
+      });
     };
   }
 }

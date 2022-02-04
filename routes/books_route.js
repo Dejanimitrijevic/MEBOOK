@@ -1,8 +1,15 @@
 const express = require('express');
-const { createBook, getAll, addToWishlist } = require('../controllers/books');
+const {
+  createBook,
+  getAll,
+  addToWishlist,
+  addToCart,
+  removeFromCart,
+} = require('../controllers/books');
 const sanitizeInputs = require('../helpers/sanitizeInputs');
 const {
   validateCreateBook,
+  validateRemoveFromCart,
   validateAddToWishList,
 } = require('../validators/booksValidate');
 const { authorize } = require('../controllers/auth');
@@ -19,4 +26,12 @@ books.get('/all', getAll);
 /// ADD BOOK TO USER WISHLIST
 books.post('/add_to_wishlist', authorize, validateAddToWishList, addToWishlist);
 
+/// ADD AND REMOVE BOOK TO AND FROM USER CART
+books.post('/add_to_cart', authorize, validateAddToWishList, addToCart);
+books.post(
+  '/remove_from_cart',
+  authorize,
+  validateRemoveFromCart,
+  removeFromCart
+);
 module.exports = books;

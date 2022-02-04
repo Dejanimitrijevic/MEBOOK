@@ -16,16 +16,23 @@ const userSchema = new Schema({
   lastName: { type: String, required: true },
   password: { type: String, required: true, select: false },
   wishlist: { type: [Schema.Types.ObjectId], ref: 'BOOK' },
+  cart: {
+    total: { type: Number, default: 0 },
+    items_count: { type: Number, default: 0 },
+    items: [
+      {
+        item: { type: Schema.Types.ObjectId, ref: 'BOOK' },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
+  },
   avatar: { type: String },
-
   account_created_at: { type: Date, default: Date.now(), select: false },
   password_changed_at: { type: Date, default: Date.now(), select: false },
-
   account_verify_otp: { type: String, select: false },
   otp_expires_in: { type: Date, select: false },
   account_verify_token: { type: String, select: false },
   is_account_verified: { type: Boolean, default: false },
-
   reset_password_token: { type: String, select: false },
   reset_token_expires_in: { type: Date, select: false },
 });
@@ -43,6 +50,19 @@ userSchema.pre(/^save/, async function () {
       );
       this.password_changed_at = Date.now();
     }
+  }
+});
+
+userSchema.pre(/^save/, async function () {
+  if (this.isModified('cart')) {
+    const items_count = this.cart.items
+      .map((el) => {
+        return el.quantity;
+      })
+      .reduce((cur, next) => {
+        return cur + next;
+      });
+    this.cart.items_count = items_count;
   }
 });
 

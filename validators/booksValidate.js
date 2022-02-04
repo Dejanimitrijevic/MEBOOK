@@ -52,6 +52,19 @@ class BooksValidator {
         });
       }
     };
+    // VALIDATE REMOVE ITEM FROM USER CART
+    this.validateRemoveFromCart = async (req, res, next) => {
+      const { itemId } = req.body;
+      if (!itemId) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'please enter the cart item id you want to delete.',
+        });
+      }
+
+      req.itemId = itemId;
+      next();
+    };
   }
 }
 
