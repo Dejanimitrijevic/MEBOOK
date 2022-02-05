@@ -52,6 +52,9 @@ bookSchema.pre(/^save/, function () {
   if (this.isNew || this.isModified('title')) {
     this.slug = slugify(this.title);
   }
+  if (this.quantity === 0) {
+    this.is_stock = false;
+  }
 });
 
 const BOOK = model('BOOK', bookSchema);

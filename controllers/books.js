@@ -55,11 +55,44 @@ class BookOperations {
     };
     // ADD BOOK TO USER CART
     this.addToCart = async (req, res, next) => {
-      const { bookID, bookTitle, bookPrice } = req;
+      const { bookID, bookTitle, bookPrice, bookQuantity } = req;
       const { quantity } = req.body;
+
+      const book = await BOOK.findById(bookID);
       const user = await USER.findById(req.user._id)
         .select('+cart')
         .populate('cart.items.item');
+      if (!book.quantity || !book.is_stock) {
+        return res.status(400).json({
+          status: 'error',
+          msg: `this item is out of stock for now.`,
+        });
+      }
+      if (!quantity || quantity % 1 !== 0) {
+        return res.status(400).json({
+          status: 'error',
+          msg: `invalid quantity value.`,
+        });
+      }
+      if (quantity && bookQuantity && quantity > bookQuantity) {
+        return res.status(400).json({
+          status: 'error',
+          msg: `only ${bookQuantity} pieces available in stock.`,
+        });
+      }
+      if (user.cart.items_count >= 99) {
+        return res.status(400).json({
+          status: 'error',
+          msg: `you reached the maximum cart items count, try remove some.`,
+        });
+      }
+      if (user.cart.items_count + +quantity > 99) {
+        return res.status(400).json({
+          status: 'error',
+          msg: `the maximum cart items count is 99 items`,
+        });
+      }
+
       if (
         !user.cart.items.length ||
         !user.cart.items.find((item) => {
@@ -68,17 +101,20 @@ class BookOperations {
       ) {
         user.cart.items.push({
           item: bookID,
-          subtotal: +bookPrice,
-          quantity: quantity || 1,
+          quantity: +quantity,
+          subtotal: +bookPrice * +quantity,
         });
+        book.quantity > 0 ? (book.quantity -= +quantity) : null;
       } else {
         user.cart.items.find((item) => {
           if (String(item.item.id) === String(bookID)) {
-            item.quantity += 1;
+            item.quantity += +quantity;
+            book.quantity > 0 ? (book.quantity -= +quantity) : null;
           }
         });
       }
       await user.save({ validateBeforeSave: false });
+      await book.save({ validateBeforeSave: false });
       res.status(200).json({
         status: 'success',
         msg: `${bookTitle} added to your shopping cart ✅.`,
@@ -87,9 +123,18 @@ class BookOperations {
     // REMOVR BOOK FROM USER CART
     this.removeFromCart = async (req, res, next) => {
       const { itemId } = req;
+      let book;
       const user = await USER.findById(req.user._id)
         .select('+cart')
         .populate('cart.items.item');
+      user.cart.items.find(async (item) => {
+        if (item.id === itemId) {
+          book = await BOOK.findById(item.item._id);
+          book.quantity += +item.quantity;
+          book.is_stock = true;
+          await book.save({ validateBeforeSave: false });
+        }
+      });
       user.cart.items = user.cart.items.filter((item) => {
         return item.id !== itemId;
       });

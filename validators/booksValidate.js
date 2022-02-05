@@ -45,6 +45,7 @@ class BooksValidator {
         req.bookID = book._id;
         req.bookTitle = book.title;
         req.bookPrice = book.price;
+        req.bookQuantity = book.quantity;
         next();
       } catch (error) {
         return res.status(400).json({
@@ -62,7 +63,6 @@ class BooksValidator {
           msg: 'please enter the cart item id you want to delete.',
         });
       }
-
       req.itemId = itemId;
       next();
     };
