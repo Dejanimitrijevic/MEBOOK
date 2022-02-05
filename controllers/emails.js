@@ -14,7 +14,6 @@ class ControlEmails {
         data: {
           userId,
           token,
-          user,
         },
       });
     };
@@ -28,7 +27,6 @@ class ControlEmails {
         status: 'success',
         select: true,
         msg: 'your account verification re-issued successfully ✅, Check your email for new OTP code.',
-        user,
         data: {
           userId: user._id,
           token,

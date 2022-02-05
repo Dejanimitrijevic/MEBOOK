@@ -50,12 +50,9 @@ class Authentication {
       const jwt_token = this.#generateJWTToken(user);
       // SUCCESS RESPONSE
       res.cookie('jwt', jwt_token, this.#cookieOptions);
-      res.status(201).json({
+      res.status(200).json({
         status: 'success',
         msg: 'logged in successfully ✅.',
-        data: {
-          user,
-        },
       });
     };
     /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
@@ -75,9 +72,6 @@ class Authentication {
       res.status(201).json({
         status: 'success',
         msg: 'your account verified successfully ✅.',
-        data: {
-          user,
-        },
       });
     };
     /// AUTHORIZE USER
@@ -175,6 +169,21 @@ class Authentication {
       res.status(200).json({
         status: 'success',
         msg: 'logged out successfully ✅.',
+      });
+    };
+    /// AUTHENTICATION GET LOGGED IN USER DATA
+    this.getUserData = async (req, res) => {
+      const { id } = req.user;
+      const user = await USER.findById(id)
+        .select('+cart')
+        .select('+avatar')
+        .select('+wishlist')
+        // .populate('wishlist')
+        .populate('cart.items.item');
+      res.status(200).json({
+        data: {
+          user,
+        },
       });
     };
   }

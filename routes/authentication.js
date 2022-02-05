@@ -27,6 +27,7 @@ const {
   userForgotPassword,
   userResetPassword,
   userLogout,
+  getUserData,
 } = require('../controllers/auth');
 
 // INIT ROUTE
@@ -81,6 +82,9 @@ auth.post(
 
 /// AUTHENTICATION USER LOGOUT ROUTE
 auth.get('/logout', userLogout);
+
+/// AUTHENTICATION GET USER DATA ROUTE
+auth.get('/current_user', authorize, getUserData);
 
 /// FOR CLIENT SIDE
 auth.post('/check_acc_verify/:userID/:token', validateVerifyAccountClient);

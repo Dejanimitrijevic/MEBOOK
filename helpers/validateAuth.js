@@ -170,9 +170,7 @@ class AuthValidate {
         }
         // GET USER
         user = await USER.findById(userID);
-        return res.status(200).json({
-          user,
-        });
+        return res.status(200).json({});
       } catch (error) {
         return res.status(403).send();
       }
@@ -286,7 +284,6 @@ class AuthValidate {
         return res.status(200).json({
           status: 'success',
           msg: 'valid token',
-          user,
         });
       } catch (error) {
         return res.status(403).send();

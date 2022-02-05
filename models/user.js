@@ -15,19 +15,28 @@ const userSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   password: { type: String, required: true, select: false },
-  wishlist: { type: [Schema.Types.ObjectId], ref: 'BOOK' },
-  cart: {
-    total: { type: Number, default: 0 },
-    items_count: { type: Number, default: 0 },
-    items: [
-      {
-        item: { type: Schema.Types.ObjectId, ref: 'BOOK' },
-        quantity: { type: Number, default: 1 },
-        subtotal: { type: Number },
-      },
-    ],
+  wishlist: {
+    type: [Schema.Types.ObjectId],
+    ref: 'BOOK',
+    select: false,
+    default: [],
   },
-  avatar: { type: String },
+  cart: {
+    default: {},
+    select: false,
+    type: {
+      total: { type: Number, default: 0 },
+      items_count: { type: Number, default: 0 },
+      items: [
+        {
+          item: { type: Schema.Types.ObjectId, ref: 'BOOK' },
+          quantity: { type: Number, default: 1 },
+          subtotal: { type: Number, default: 0 },
+        },
+      ],
+    },
+  },
+  avatar: { type: String, select: false },
   account_created_at: { type: Date, default: Date.now(), select: false },
   password_changed_at: { type: Date, default: Date.now(), select: false },
   account_verify_otp: { type: String, select: false },
@@ -55,7 +64,7 @@ userSchema.pre(/^save/, async function () {
 });
 
 userSchema.pre(/^save/, async function () {
-  if (this.isNew || this.isModified('cart')) {
+  if (this.isModified('cart')) {
     //@ CALCULATE TOTAL CART ITEMS COUNT
     const items_count = this.cart.items
       .map((el) => {
@@ -82,10 +91,7 @@ userSchema.pre(/^save/, async function () {
 });
 
 userSchema.pre(/^find/, async function () {
-  this.populate('cart.items.item');
-});
-userSchema.pre(/^save/, async function () {
-  this.populate('cart.items.item');
+  this.select('-__v');
 });
 
 // USER SCHEMA METHODS

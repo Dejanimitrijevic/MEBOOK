@@ -24,14 +24,13 @@ class BookOperations {
       res.status(201).json({
         status: 'success',
         msg: 'book created successfully ✅.',
-        book,
       });
       next();
     };
     // ADD BOOK TO USER WISHLIST
     this.addToWishlist = async (req, res, next) => {
       const { bookID, bookTitle } = req;
-      const user = await USER.findById(req.user._id);
+      const user = await USER.findById(req.user._id).select('+wishlist');
 
       if (!user.wishlist.includes(bookID)) {
         user.wishlist.push(bookID);
@@ -39,7 +38,6 @@ class BookOperations {
         res.status(200).json({
           status: 'success',
           msg: `${bookTitle} added to your wishlist ✅.`,
-          data: { user },
         });
       } else if (user.wishlist.includes(bookID)) {
         const newWishList = user.wishlist.filter((item) => {
@@ -52,7 +50,6 @@ class BookOperations {
         res.status(200).json({
           status: 'success',
           msg: `${bookTitle} removed from your wishlist ✅.`,
-          data: { user },
         });
       }
     };
@@ -60,7 +57,9 @@ class BookOperations {
     this.addToCart = async (req, res, next) => {
       const { bookID, bookTitle, bookPrice } = req;
       const { quantity } = req.body;
-      const user = await USER.findById(req.user._id);
+      const user = await USER.findById(req.user._id)
+        .select('+cart')
+        .populate('cart.items.item');
       if (
         !user.cart.items.length ||
         !user.cart.items.find((item) => {
@@ -83,12 +82,14 @@ class BookOperations {
       res.status(200).json({
         status: 'success',
         msg: `${bookTitle} added to your shopping cart ✅.`,
-        data: { user },
       });
     };
     // REMOVR BOOK FROM USER CART
     this.removeFromCart = async (req, res, next) => {
-      const { itemId, user } = req;
+      const { itemId } = req;
+      const user = await USER.findById(req.user._id)
+        .select('+cart')
+        .populate('cart.items.item');
       user.cart.items = user.cart.items.filter((item) => {
         return item.id !== itemId;
       });
@@ -96,7 +97,6 @@ class BookOperations {
       res.status(200).json({
         status: 'success',
         msg: `item removed from your shopping cart ✅.`,
-        data: { user },
       });
     };
   }
