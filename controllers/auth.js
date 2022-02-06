@@ -178,7 +178,7 @@ class Authentication {
         .select('+cart')
         .select('+avatar')
         .select('+wishlist')
-        // .populate('wishlist')
+        .populate('wishlist')
         .populate('cart.items.item');
       res.status(200).json({
         data: {
