@@ -1,52 +1,52 @@
-books categories ( 7 Categories ) with 5 sub-categories with 10 books (TOTAL 350 NOW 14)
+books categories ( 7 Categories ) with 5 sub-categories with 10 books (TOTAL 350 NOW 35 (10%))
 add 2 books for each sub_category manually and 8 with dashboard
 
 >>> CATEGORIES:
-    1+ computers & technology (2) :
+    1+ computers & technology (6) :
         # computer science (1)
         # graphics & design (1)
-        # web development & design
-        # programming languages
-        # internet & social media
-        # networking & cloud computing
+        # web development & design (1)
+        # programming languages (1)
+        # internet & social media (1)
+        # networking & cloud computing (1)
 
-    2+ health, fitness & dieting (2) :
+    2+ health, fitness & dieting (5) :
         # health recovery (1)
         # exercise & fitness (1)
-        # sports health & safety
-        # children's health
-        # mental health
+        # sports health & safety (1)
+        # children's health (1)
+        # mental health (1)
 
-    3+ science fiction & fantasy (2) :
+    3+ science fiction & fantasy (4) :
         # science fiction (1)
         # fantasy (1)
-        # gaming
-        # writing
+        # gaming (1)
+        # writing (1)
 
-    4+ sports & outdoors (2) :
+    4+ sports & outdoors (5) :
         # basketball (1)
         # football (1)
-        # sports coaching
-        # sports training
-        # individual sports
+        # sports coaching (1)
+        # sports training (1)
+        # individual sports (1)
 
-    5+ romance (2) :
+    5+ romance (5) :
         # action & adventure (1)
         # historical romances (1)
-        # sports romance
-        # western romances
-        # military romance
+        # sports romance (1)
+        # western romances (1)
+        # military romance (1)
 
-    6+ literature & fiction (2) :
+    6+ literature & fiction (5) :
         # action & adventure fiction (1)
         # world literature (1)
-        # historical fiction
-        # dramas & plays
-        # ancient & medieval literature
+        # historical fiction (1)
+        # dramas & plays (1)
+        # ancient & medieval literature (1)
 
-    7+ medical books (2) :
+    7+ medical books (5) :
         # basic medical sciences (1)
         # medical informatics (1)
-        # dentistry
-        # nursing
-        # pharmacology
+        # dentistry (1)
+        # nursing (1)
+        # pharmacology (1)
