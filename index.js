@@ -9,7 +9,7 @@ require('dotenv').config('./.env');
 // CONNECT MONGO DATABASE
 const { connectDB, updateDbCollection } = require('./database');
 connectDB();
-updateDbCollection(collection, data);
+// updateDbCollection(collection, data);
 
 // CONNECT API SERVER
 require('./server');
