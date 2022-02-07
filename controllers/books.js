@@ -12,11 +12,32 @@ class BookOperations {
         .limitFields()
         .paginate();
       const books = await features.query;
+      const allBooksLength = await BOOK.find();
       res.status(200).json({
         status: 'success',
+        count: allBooksLength.length,
         books,
       });
       next();
+    };
+    // GET CATEGORY BOOKS
+    this.getCategoryBooks = async (req, res) => {
+      const features = new APIFeatures(
+        BOOK.find({ category: req.params.id }),
+        req.query
+      )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+      const books = await features.query;
+      const allBooksLength = await BOOK.find({ category: req.params.id });
+
+      res.status(200).json({
+        status: 'success',
+        count: allBooksLength.length,
+        books,
+      });
     };
     // CREATE A NEW BOOK
     this.createBook = async (req, res, next) => {

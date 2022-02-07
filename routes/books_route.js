@@ -2,6 +2,7 @@ const express = require('express');
 const {
   createBook,
   getAll,
+  getCategoryBooks,
   addToWishlist,
   addToCart,
   removeFromCart,
@@ -22,6 +23,9 @@ books.post('/new', sanitizeInputs, validateCreateBook, createBook);
 
 /// GET ALL BOOKS
 books.get('/all', getAll);
+
+/// GET CATEGORY BOOKS
+books.get('/category/:id', getCategoryBooks);
 
 /// ADD BOOK TO USER WISHLIST
 books.post('/add_to_wishlist', authorize, validateAddToWishList, addToWishlist);
