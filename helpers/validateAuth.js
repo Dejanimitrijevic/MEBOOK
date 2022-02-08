@@ -83,6 +83,33 @@ class AuthValidate {
       req.user = user;
       next();
     };
+    /// VALIDATE ADMIN LOGIN PROCESS
+    this.validateAdminLogin = async (req, res, next) => {
+      // CHECK FOR NEEDED DATA
+      if (isDataMissed(req.body, 'email', 'password')) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'please enter the required fields to login (username and password)',
+        });
+      }
+      // CHECK IF USER IS EXIST AND COMPARE PASSWORDS
+      const user = await USER.findOne({ email: req.body.email }).select(
+        '+password'
+      );
+      if (
+        !user ||
+        !(await bcrypt.compare(req.body.password, user.password)) ||
+        user.role === 'user'
+      ) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'incorrect password or username.',
+        });
+      }
+      user.password = undefined;
+      req.user = user;
+      next();
+    };
     /// VALIDATE USER ACCOUNT VERIFICATION PROCESS
     this.validateVerifyAccount = async (req, res, next) => {
       const { userID, token } = req.params;
