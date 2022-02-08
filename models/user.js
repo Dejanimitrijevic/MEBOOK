@@ -9,7 +9,6 @@ const userSchema = new Schema({
     type: String,
     default: 'user',
     enum: ['admin', 'user', 'owner'],
-    select: false,
   },
   email: { type: String, required: true, unique: true },
   firstName: { type: String, required: true },

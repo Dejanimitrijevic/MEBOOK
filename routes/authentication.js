@@ -9,6 +9,7 @@ const {
   validateResetPassword,
   validateVerifyAccountClient,
   validateResetPassClient,
+  validateAdminLogin,
 } = require('../helpers/validateAuth');
 
 const {
@@ -45,6 +46,7 @@ auth.post(
 
 /// AUTHENTICATION USER LOGIN ROUTE
 auth.post('/login', sanitizeInputs, validateLogin, userLogin);
+auth.post('/admin_login', validateAdminLogin, userLogin);
 
 /// AUTHENTICATION USER VERIFY ACCOUNT ROUTE
 auth.post(
