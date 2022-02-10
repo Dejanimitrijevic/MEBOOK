@@ -52,7 +52,7 @@ class Authentication {
       res.cookie('jwt', jwt_token, this.#cookieOptions);
       res.status(200).json({
         status: 'success',
-        msg: 'logged in successfully ✅.',
+        msg: 'Logged in successfully ✅',
       });
     };
     /// AUTHENTICATION  USER ACCOUNT VERIFY METHOD
@@ -71,7 +71,7 @@ class Authentication {
       res.cookie('jwt', jwt_token, this.#cookieOptions);
       res.status(201).json({
         status: 'success',
-        msg: 'your account verified successfully ✅.',
+        msg: 'Your account verified successfully ✅',
       });
     };
     /// AUTHORIZE USER
@@ -82,7 +82,7 @@ class Authentication {
       if (!token) {
         return res.status(401).json({
           status: 'error',
-          msg: 'not logged in, try log in again.',
+          msg: 'Not logged in, try log in again',
         });
       }
       // VERIFY JWT TOKEN
@@ -92,7 +92,7 @@ class Authentication {
           if (!valid) {
             return res.status(401).json({
               status: 'error',
-              msg: 'not logged in, try log in again.',
+              msg: 'Not logged in, try log in again',
             });
           }
           if (valid) {
@@ -101,30 +101,40 @@ class Authentication {
             if (!user) {
               return res.status(401).json({
                 status: 'error',
-                msg: 'not logged in, try log in again.',
+                msg: 'Not logged in, try log in again',
               });
             }
             if (user) {
-              // if (
-              //   user.password_changed_at &&
-              //   Date.parse(user.password_changed_at) > valid.iat * 1000
-              // ) {
-              //   return res.status(401).json({
-              //     status: 'error',
-              //     msg: 'password changed after session is issued, try login again.',
-              //   });
-              // }
+              if (
+                user.password_changed_at &&
+                Date.parse(user.password_changed_at) > valid.iat * 1000
+              ) {
+                return res.status(401).json({
+                  status: 'error',
+                  msg: 'Password changed after session is issued, try login again',
+                });
+              }
             }
           }
         } catch (error) {
           return res.status(401).json({
             status: 'error',
-            msg: 'not logged in, try log in again.',
+            msg: 'Not logged in, try log in again',
           });
         }
       }
       user.password_changed_at = undefined;
       req.user = user;
+      next();
+    };
+    /// AUTHORIZE TO ONLY EMAIL VERIFIED USERS
+    this.restrictToVerifiedUser = (req, res, next) => {
+      if (!req.user.is_account_verified) {
+        return res.status(402).json({
+          status: 'error',
+          msg: 'You have to verify your email address to perfom this action',
+        });
+      }
       next();
     };
     /// AUTHENTICATION RE_INITIALIZE USER ACCOUNT VERIFICATION METHOD
@@ -160,7 +170,7 @@ class Authentication {
       user.save({ validateBeforeSave: false });
       res.status(200).json({
         status: 'success',
-        msg: 'your password has been reset successfully ✅.',
+        msg: 'Your password has been reset successfully ✅',
       });
     };
     /// AUTHENTICATION USER LOGOUT METHOD
@@ -168,7 +178,7 @@ class Authentication {
       res.clearCookie('jwt', { ...this.#cookieOptions, maxAge: 0 });
       res.status(200).json({
         status: 'success',
-        msg: 'logged out successfully ✅.',
+        msg: 'Logged out successfully ✅',
       });
     };
     /// AUTHENTICATION GET LOGGED IN USER DATA
@@ -178,6 +188,7 @@ class Authentication {
         .select('+cart')
         .select('+avatar')
         .select('+wishlist')
+        .select('+orders')
         .populate('wishlist')
         .populate('cart.items.item');
       res.status(200).json({

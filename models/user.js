@@ -20,6 +20,12 @@ const userSchema = new Schema({
     select: false,
     default: [],
   },
+  orders: {
+    type: [Schema.Types.ObjectId],
+    ref: 'ORDER',
+    select: false,
+    default: [],
+  },
   cart: {
     default: {},
     select: false,
@@ -41,7 +47,7 @@ const userSchema = new Schema({
   account_verify_otp: { type: String, select: false },
   otp_expires_in: { type: Date, select: false },
   account_verify_token: { type: String, select: false },
-  is_account_verified: { type: Boolean, default: false },
+  is_account_verified: { type: Boolean },
   reset_password_token: { type: String, select: false },
   reset_token_expires_in: { type: Date, select: false },
 });

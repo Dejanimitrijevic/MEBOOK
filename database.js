@@ -26,6 +26,12 @@ class DatabaseOperations {
       await collection.create(data);
       console.log('DONE');
     };
+
+    // CLEAR COLLECTION
+    this.clearCollection = async (collection) => {
+      await collection.deleteMany();
+      console.log('DONE');
+    };
   }
 }
 

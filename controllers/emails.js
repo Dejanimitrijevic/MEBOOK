@@ -10,7 +10,7 @@ class ControlEmails {
       // SUCCESS RESPONSE
       res.status(201).json({
         status: 'success',
-        msg: 'account created successfully ✅, Check your email for otp code.',
+        msg: 'Account created successfully ✅, Check your email for otp code',
         data: {
           userId,
           token,
@@ -26,7 +26,7 @@ class ControlEmails {
       res.status(201).json({
         status: 'success',
         select: true,
-        msg: 'your account verification re-issued successfully ✅, Check your email for new OTP code.',
+        msg: 'Your account verification re-issued successfully ✅, Check your email for new OTP code',
         data: {
           userId: user._id,
           token,

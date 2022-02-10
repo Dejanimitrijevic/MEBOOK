@@ -3,6 +3,7 @@ const validator = require('validator');
 module.exports = (req, res, next) => {
   for (const value in req.body) {
     if (
+      !typeof value === Object &&
       !value.includes(`password`) &&
       !value.includes(`Password`) &&
       !validator.isBoolean(String(req.body[value]))

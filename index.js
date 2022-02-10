@@ -7,8 +7,13 @@ const collection = require('./models/book');
 require('dotenv').config('./.env');
 
 // CONNECT MONGO DATABASE
-const { connectDB, updateDbCollection } = require('./database');
+const {
+  connectDB,
+  updateDbCollection,
+  clearCollection,
+} = require('./database');
 connectDB();
+// clearCollection(collection);
 // updateDbCollection(collection, data);
 
 // CONNECT API SERVER
