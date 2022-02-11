@@ -3,6 +3,7 @@ const {
   createBook,
   getAll,
   getCategoryBooks,
+  getSubCategoryBooks,
   addToWishlist,
   addToCart,
   removeFromCart,
@@ -26,6 +27,9 @@ books.get('/all', getAll);
 
 /// GET CATEGORY BOOKS
 books.get('/category/:id', getCategoryBooks);
+
+/// GET CATEGORY BOOKS
+books.get('/sub_category/:id', getSubCategoryBooks);
 
 /// ADD BOOK TO USER WISHLIST
 books.post('/add_to_wishlist', authorize, validateAddToWishList, addToWishlist);

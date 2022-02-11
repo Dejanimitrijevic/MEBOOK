@@ -39,6 +39,25 @@ class BookOperations {
         books,
       });
     };
+    // GET CATEGORY BOOKS
+    this.getSubCategoryBooks = async (req, res) => {
+      const features = new APIFeatures(
+        BOOK.find({ sub_category: req.params.id }),
+        req.query
+      )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+      const books = await features.query;
+      const allBooksLength = await BOOK.find({ sub_category: req.params.id });
+
+      res.status(200).json({
+        status: 'success',
+        count: allBooksLength.length,
+        books,
+      });
+    };
     // CREATE A NEW BOOK
     this.createBook = async (req, res, next) => {
       const book = await BOOK.create({ title: 'N?A' });
