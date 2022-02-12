@@ -8,6 +8,8 @@ const api = require('./routes/api');
 const app = express();
 
 // API SERVER MIDDLEWARS
+app.use(express.static('public'));
+
 app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', req.headers.origin);

@@ -29,6 +29,8 @@ const {
   userResetPassword,
   userLogout,
   getUserData,
+  uploadUserAvatar,
+  userUpdateAvatar,
 } = require('../controllers/auth');
 
 // INIT ROUTE
@@ -43,11 +45,9 @@ auth.post(
   initAccountVerification,
   sendAccVerification
 );
-
 /// AUTHENTICATION USER LOGIN ROUTE
 auth.post('/login', sanitizeInputs, validateLogin, userLogin);
 auth.post('/admin_login', validateAdminLogin, userLogin);
-
 /// AUTHENTICATION USER VERIFY ACCOUNT ROUTE
 auth.post(
   '/verify/:userID/:token',
@@ -56,7 +56,6 @@ auth.post(
   validateVerifyAccount,
   userAccountVerify
 );
-
 /// AUTHENTICATION USER VERIFY ACCOUNT RE_PROCESS ROUTE
 auth.get(
   '/re-verify/:userID',
@@ -65,7 +64,6 @@ auth.get(
   reAccountVerification,
   sendNewOtp
 );
-
 /// AUTHENTICATION USER FORGOT ACCOUNT PASSWORD ROUTE
 auth.post(
   '/forgot-password',
@@ -74,7 +72,6 @@ auth.post(
   userForgotPassword,
   sendForgotPassword
 );
-
 auth.post(
   '/reset-password/:id/:token',
   sanitizeInputs,
@@ -82,12 +79,12 @@ auth.post(
   userResetPassword
 );
 
+/// AUTHENTICATION USER UPDATE AVATAR IMG ROUTE
+auth.patch('/update_avatar', authorize, uploadUserAvatar, userUpdateAvatar);
 /// AUTHENTICATION USER LOGOUT ROUTE
 auth.get('/logout', userLogout);
-
 /// AUTHENTICATION GET USER DATA ROUTE
 auth.get('/current_user', authorize, getUserData);
-
 /// FOR CLIENT SIDE
 auth.post('/check_acc_verify/:userID/:token', validateVerifyAccountClient);
 auth.post('/check_reset_pass/:id/:token', validateResetPassClient);

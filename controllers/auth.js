@@ -1,6 +1,29 @@
 const filterRequest = require('../helpers/filterRequest');
 const USER = require('../models/user');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const sharp = require('sharp');
+const multerStore = multer.memoryStorage({});
+// const multerStore = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+const upload = multer({
+  storage: multerStore,
+  fileFilter: multerFilter,
+});
 
 class Authentication {
   #generateJWTToken = (user) => {
@@ -10,8 +33,8 @@ class Authentication {
   };
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
-    httpOnly: false,
-    secure: true,
+    // httpOnly: false,
+    // secure: true,
     sameSite: 'none',
   };
   constructor() {
@@ -180,6 +203,40 @@ class Authentication {
         status: 'success',
         msg: 'Logged out successfully ✅',
       });
+    };
+
+    /// AUTHENTICATION USER UPDATE AVATAR IMG
+    this.uploadUserAvatar = upload.single('avatar');
+    this.userUpdateAvatar = async (req, res, next) => {
+      if (!req.file) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Invalid Image',
+        });
+      } else {
+        if (req.file && req.file.size > 1024000) {
+          return res.status(400).json({
+            status: 'error',
+            msg: 'Image size must be smaller than 1 mb',
+          });
+        } else {
+          req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+          await sharp(req.file.buffer)
+            .resize(128, 128)
+            .toFormat('jpeg')
+            .jpeg({ quality: 90 })
+            .toFile(`public/img/users/${req.file.filename}`);
+          const user = await USER.findById(req.user.id).select('+avatar');
+          user.avatar = `${req.protocol}://${req.get('host')}/img/users/${
+            req.file.filename
+          }`;
+          await user.save({ validateBeforeSave: false });
+          res.status(200).json({
+            status: 'success',
+            msg: 'Your avatar photo has been updated successfuly',
+          });
+        }
+      }
     };
     /// AUTHENTICATION GET LOGGED IN USER DATA
     this.getUserData = async (req, res) => {
