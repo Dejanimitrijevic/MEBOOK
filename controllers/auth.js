@@ -4,15 +4,6 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const sharp = require('sharp');
 const multerStore = multer.memoryStorage({});
-// const multerStore = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public/img/users');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -33,8 +24,8 @@ class Authentication {
   };
   #cookieOptions = {
     maxAge: +process.env.JWT_COOKIE_EXPIRES_AT,
-    // httpOnly: false,
-    // secure: true,
+    httpOnly: false,
+    secure: true,
     sameSite: 'none',
   };
   constructor() {
@@ -243,6 +234,7 @@ class Authentication {
       const { id } = req.user;
       const user = await USER.findById(id)
         .select('+cart')
+        .select('+account_created_at')
         .select('+avatar')
         .select('+wishlist')
         .select('+orders')
