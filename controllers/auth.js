@@ -238,6 +238,7 @@ class Authentication {
         .select('+avatar')
         .select('+wishlist')
         .select('+orders')
+        .populate('orders')
         .populate('wishlist')
         .populate('cart.items.item');
       res.status(200).json({

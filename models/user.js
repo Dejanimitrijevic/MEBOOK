@@ -41,13 +41,13 @@ const userSchema = new Schema({
       ],
     },
   },
-  avatar: { type: String, select: false },
-  account_created_at: { type: Date, default: Date.now(), select: false },
-  password_changed_at: { type: Date, default: Date.now(), select: false },
+  avatar: { type: String, select: false, default: '' },
+  account_created_at: { type: Date, default: Date.now, select: false },
+  password_changed_at: { type: Date, default: Date.now, select: false },
   account_verify_otp: { type: String, select: false },
   otp_expires_in: { type: Date, select: false },
   account_verify_token: { type: String, select: false },
-  is_account_verified: { type: Boolean },
+  is_account_verified: { type: Boolean, default: false },
   reset_password_token: { type: String, select: false },
   reset_token_expires_in: { type: Date, select: false },
 });
@@ -63,7 +63,7 @@ userSchema.pre(/^save/, async function () {
         this.password,
         +process.env.BCRYPT_SALT
       );
-      this.password_changed_at = Date.now();
+      this.password_changed_at = Date.now()();
     }
   }
 });

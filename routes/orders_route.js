@@ -1,6 +1,6 @@
 const express = require('express');
 const { authorize, restrictToVerifiedUser } = require('../controllers/auth');
-const { placeNewOrder } = require('../controllers/orders');
+const { placeNewOrder, cancelOrder } = require('../controllers/orders');
 const sanitizeInputs = require('../helpers/sanitizeInputs');
 const { validatePlaceNewOrder } = require('../validators/ordersValidate');
 
@@ -17,4 +17,7 @@ orders.post(
   validatePlaceNewOrder,
   placeNewOrder
 );
+
+/// CANCEL AN ORDER
+orders.post('/cancel_order', authorize, cancelOrder);
 module.exports = orders;

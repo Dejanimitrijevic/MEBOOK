@@ -4,6 +4,31 @@ const APIFeatures = require('../utils/apiFeatures');
 
 class BookOperations {
   constructor() {
+    // GET ONE BOOK
+    this.getBook = async (req, res) => {
+      try {
+        const book = await BOOK.findOne({ slug: req.params.id })
+          .populate('category')
+          .populate('sub_category');
+        if (!book) {
+          return res.status(404).json({
+            status: 'error',
+            msg: `There is no book with this title`,
+          });
+        } else {
+          return res.status(200).json({
+            data: {
+              book,
+            },
+          });
+        }
+      } catch (error) {
+        return res.status(404).json({
+          status: 'error',
+          msg: `There is no book with this title`,
+        });
+      }
+    };
     // GET ALL BOOKS
     this.getAll = async (req, res, next) => {
       const features = new APIFeatures(BOOK.find(), req.query)

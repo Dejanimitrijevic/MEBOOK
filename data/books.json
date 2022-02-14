@@ -645,7 +645,8 @@
     "pages_count": 216,
     "last_price": 31,
     "discount": 0,
-    "quantity": 1000,
+    "quantity": 0,
+    "is_stock": 0,
     "average_rating": 3,
     "category": "61f84eb1dc1d9702913a4398",
     "sub_category": "61f84cf43c4594f1d2f692aa"

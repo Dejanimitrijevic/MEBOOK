@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
-const slugify = require('slugify');
+const slug = require('slugify');
 
 const bookSchema = new Schema({
   // REQUIRED FIELDS
@@ -12,7 +12,7 @@ const bookSchema = new Schema({
   publication_date: { type: Date, required: true },
   language: { type: String, required: true },
   last_price: { type: Number, required: true },
-  quantity: { type: Number, required: true },
+  quantity: { type: Number, required: true, default: 0 },
   description: { type: String, required: true },
   overview: { type: String, required: true },
   category: { type: Schema.Types.ObjectId, ref: 'CATEGORY', required: true },
@@ -26,13 +26,13 @@ const bookSchema = new Schema({
   // OPTIONAL FIELDS
   slug: { type: String },
   price: { type: Number },
-  reviews: { type: [String] },
   average_rating: { type: Number, default: 0 },
-  ratings_count: { type: Number, default: 0 },
+  // reviews: { type: [String] },
+  // ratings_count: { type: Number, default: 0 },
   tags: { type: [String] },
-  created_at: { type: Date, default: Date.now() },
+  created_at: { type: Date, default: Date.now },
   is_stock: { type: Boolean, default: true },
-  discount: { type: Number },
+  discount: { type: Number, default: 0 },
 });
 
 // SCHEMA MIDDLEWARS
@@ -50,7 +50,7 @@ bookSchema.pre(/^save/, function () {
 
 bookSchema.pre(/^save/, function () {
   if (this.isNew || this.isModified('title')) {
-    this.slug = slugify(this.title);
+    this.slug = slug(this.title, { lower: true });
   }
   if (this.quantity === 0) {
     this.is_stock = false;
