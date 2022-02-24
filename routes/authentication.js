@@ -10,6 +10,8 @@ const {
   validateVerifyAccountClient,
   validateResetPassClient,
   validateAdminLogin,
+  validateUserUpdate,
+  validateUpdatePassword,
 } = require('../helpers/validateAuth');
 
 const {
@@ -31,6 +33,8 @@ const {
   getUserData,
   uploadUserAvatar,
   userUpdateAvatar,
+  updateUserInformation,
+  userDeleteAccount,
 } = require('../controllers/auth');
 
 // INIT ROUTE
@@ -74,9 +78,21 @@ auth.post(
 );
 auth.post(
   '/reset-password/:id/:token',
-  sanitizeInputs,
   validateResetPassword,
   userResetPassword
+);
+auth.patch(
+  '/change-password',
+  authorize,
+  validateUpdatePassword,
+  userResetPassword
+);
+auth.patch(
+  '/update',
+  authorize,
+  sanitizeInputs,
+  validateUserUpdate,
+  updateUserInformation
 );
 
 /// AUTHENTICATION USER UPDATE AVATAR IMG ROUTE
@@ -89,4 +105,5 @@ auth.get('/current_user', authorize, getUserData);
 auth.post('/check_acc_verify/:userID/:token', validateVerifyAccountClient);
 auth.post('/check_reset_pass/:id/:token', validateResetPassClient);
 
+auth.post('/delete', authorize, userDeleteAccount);
 module.exports = auth;

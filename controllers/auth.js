@@ -3,6 +3,7 @@ const USER = require('../models/user');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const sharp = require('sharp');
+const bcrypt = require('bcryptjs');
 const multerStore = multer.memoryStorage({});
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
@@ -125,7 +126,7 @@ class Authentication {
               ) {
                 return res.status(401).json({
                   status: 'error',
-                  msg: 'Password changed after session is issued, try login again',
+                  msg: 'Password had changed recently, please try login again',
                 });
               }
             }
@@ -184,7 +185,7 @@ class Authentication {
       user.save({ validateBeforeSave: false });
       res.status(200).json({
         status: 'success',
-        msg: 'Your password has been reset successfully ✅',
+        msg: 'Your password has been changed successfully',
       });
     };
     /// AUTHENTICATION USER LOGOUT METHOD
@@ -192,7 +193,7 @@ class Authentication {
       res.clearCookie('jwt', { ...this.#cookieOptions, maxAge: 0 });
       res.status(200).json({
         status: 'success',
-        msg: 'Logged out successfully ✅',
+        msg: 'Logged out successfully',
       });
     };
 
@@ -245,6 +246,43 @@ class Authentication {
         data: {
           user,
         },
+      });
+    };
+    /// UPDATE USER INFORMATION
+    this.updateUserInformation = async (req, res) => {
+      const { id } = req.user;
+      const { firstName, lastName, email } = req.body;
+      const user = await USER.findById(id);
+      user.firstName = firstName || user.firstName;
+      user.lastName = lastName || user.lastName;
+      user.email = email || user.email;
+      await user.save({ validateBeforeSave: false });
+      return res.status(200).json({
+        status: 'success',
+        msg: 'Your information updated successfully',
+      });
+    };
+
+    /// USER DELETE ACCOUNT
+    this.userDeleteAccount = async (req, res) => {
+      const { id } = req.user;
+      const user = await USER.findById(id).select('+password').select('+cart');
+      if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'incorrect current password',
+        });
+      }
+      if (user.cart.items_count) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Please clear your shopping cart first in order to delete your account',
+        });
+      }
+      await USER.findByIdAndDelete(id);
+      return res.status(200).json({
+        status: 'success',
+        msg: 'Account deleted successfully',
       });
     };
   }

@@ -8,11 +8,11 @@ module.exports = (email, temp, data) => {
     },
     send: true,
     transport: {
-      host: 'smtp.ethereal.email',
-      port: 587,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
       auth: {
-        user: 'ava.sporer98@ethereal.email',
-        pass: 'He87sBUbJJr53Cusum',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     },
     juice: true,
@@ -40,6 +40,7 @@ module.exports = (email, temp, data) => {
       console.log(`EMAIL SENT 💌✅`);
     })
     .catch((err) => {
+      console.log(err);
       console.log(`EMAIL ERROR 💌⛔`);
     });
 };

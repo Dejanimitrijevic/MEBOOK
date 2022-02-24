@@ -54,6 +54,11 @@ const userSchema = new Schema({
 
 // USER SCHEMA MIDDLEWARS
 userSchema.pre(/^save/, async function () {
+  if (this.isNew || this.isModified('email')) {
+    this.is_account_verified = false;
+  }
+});
+userSchema.pre(/^save/, async function () {
   if (this.isNew) {
     this.password = await bcrypt.hash(this.password, +process.env.BCRYPT_SALT);
   }
@@ -63,7 +68,7 @@ userSchema.pre(/^save/, async function () {
         this.password,
         +process.env.BCRYPT_SALT
       );
-      this.password_changed_at = Date.now()();
+      this.password_changed_at = Date.now();
     }
   }
 });

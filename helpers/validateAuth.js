@@ -316,6 +316,101 @@ class AuthValidate {
         return res.status(403).send();
       }
     };
+    /// VALIDATE USER INFORMATION UPDATE
+    this.validateUserUpdate = async (req, res, next) => {
+      const { id } = req.user;
+      const user = await USER.findById(id);
+      if (!req.body.firstName && !req.body.lastName && !req.body.email) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Please enter the new values you want to update',
+        });
+      }
+      const { firstName, lastName, email } = req.body;
+      if (
+        firstName === user.firstName ||
+        lastName === user.lastName ||
+        email === user.email
+      ) {
+        return res.status(400).json({
+          status: 'error',
+          msg: "Can't update your information with current data, Please input new values",
+        });
+      }
+      for (const value in req.body) {
+        // VALIDATE USER EMAIL ADDRESS
+        if (value.includes('email')) {
+          if (!validator.isEmail(req.body.email)) {
+            return res.status(400).json({
+              status: 'error',
+              msg: 'please enter a valid email address.',
+            });
+          }
+        } else {
+          // VALIDATE USER PASSWORDS
+          if (value.includes('password') || value.includes('Password')) {
+            if (
+              !validator.isStrongPassword(req.body[value], { minSymbols: 0 })
+            ) {
+              return res.status(400).json({
+                status: 'error',
+                msg: 'your password must be at least 8 characters with uppercase and numbers',
+              });
+            }
+          } else {
+            // VALIDATE USER NAME (NAME WITHOUT NUMBERS)
+            if (value.includes('name') || value.includes('Name')) {
+              if (
+                !validator.isAlpha(req.body[value], 'en-US', { ignore: ' ' })
+              ) {
+                return res.status(400).json({
+                  status: 'error',
+                  msg: 'user name can contains only letters (a-z)(A-Z)',
+                });
+              }
+            }
+          }
+        }
+      }
+      next();
+    };
+    /// VALIDAE UPDATE PASSWORD
+    this.validateUpdatePassword = async (req, res, next) => {
+      const user = await USER.findById(req.user.id).select('+password');
+      if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'incorrect current password',
+        });
+      }
+      if (isDataMissed(req.body, 'newPassword', 'newPasswordConfirmation')) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'please enter the required fields to change your password',
+        });
+      }
+      ///////////
+      for (const value in req.body) {
+        if (value.includes('Password')) {
+          if (!validator.isStrongPassword(req.body[value], { minSymbols: 0 })) {
+            return res.status(400).json({
+              status: 'error',
+              msg: 'your password must be at least 8 characters with uppercase and numbers',
+            });
+          }
+        }
+      }
+      if (req.body.newPassword !== req.body.newPasswordConfirmation) {
+        return res.status(400).json({
+          status: 'error',
+          msg: 'Password and password confirmation are not the same',
+        });
+      }
+      req.user = user;
+      req.password = req.body.newPassword;
+      console.log(user);
+      next();
+    };
   }
 }
 
