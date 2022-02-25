@@ -18,10 +18,12 @@ module.exports = (email, temp, data) => {
       from: process.env.APP_EMAIL,
     },
     send: true,
+    preview: false,
     transport: {
       service: 'gmail',
-      // host: process.env.SMTP_HOST,
-      // port: process.env.SMTP_PORT,
+      jsonTransport: true,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
