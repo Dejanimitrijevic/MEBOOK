@@ -20,9 +20,6 @@ module.exports = (email, temp, data) => {
     send: true,
     preview: false,
     transport: {
-      service: 'gmail',
-      name: 'gmail',
-      jsonTransport: true,
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       auth: {
