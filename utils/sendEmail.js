@@ -3,6 +3,17 @@ const path = require('path');
 
 module.exports = (email, temp, data) => {
   const mail = new Email({
+    juice: true,
+    juiceSettings: {
+      tableElements: ['TABLE'],
+    },
+    juiceResources: {
+      preserveImportant: true,
+      webResources: {
+        relativeTo: path.join(__dirname, '..', 'emails', temp),
+        images: true,
+      },
+    },
     message: {
       from: process.env.APP_EMAIL,
     },
@@ -13,16 +24,6 @@ module.exports = (email, temp, data) => {
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
-      },
-    },
-    juice: true,
-    juiceSettings: {
-      tableElements: ['TABLE'],
-    },
-    juiceResources: {
-      preserveImportant: true,
-      webResources: {
-        relativeTo: path.join(__dirname, '..', 'emails', temp),
       },
     },
   });
