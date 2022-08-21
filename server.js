@@ -33,5 +33,5 @@ app.use('/api', api);
 
 const PORT = process.env.PORT || 4040;
 app.listen(PORT, () => {
-  console.log(`SERVER LISTENING 🔊`);
+  console.log(`SERVER LISTENING ${PORT} 🔊`);
 });
